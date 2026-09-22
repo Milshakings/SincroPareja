@@ -18,14 +18,13 @@
   <!-- OneSignal Web Push SDK -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
-
     const ONESIGNAL_APP_ID = "f6af645a-6fd3-42f3-9221-24090e28478d";
     const ONESIGNAL_REST_API_KEY = "4dna6lsc5ulg5e6vzqq3daenv";
     
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
-        appId: "f6af645a-6fd3-42f3-9221-24090e28478d"
+        appId: ONESIGNAL_APP_ID
       });
     });
 
@@ -36,7 +35,7 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Basic ${4dna6lsc5ulg5e6vzqq3daenv}`
+            "Authorization": `Basic ${ONESIGNAL_REST_API_KEY}`
           },
           body: JSON.stringify({
             app_id: ONESIGNAL_APP_ID,
@@ -73,11 +72,11 @@
   <main class="max-w-md mx-auto p-4 space-y-6">
 
     <!-- Botón de prueba de notificaciones -->
-<section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 text-center">
-  <button onclick="probarNotificacion()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
-    <span>🔔</span> Probar Notificación Push en Ambos Celulares
-  </button>
-</section>
+    <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 text-center">
+      <button onclick="probarNotificacion()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
+        <span>🔔</span> Probar Notificación Push en Ambos Celulares
+      </button>
+    </section>
 
     <!-- Tarjeta: Registrar Inicio de Periodo con Fecha Flexible -->
     <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
@@ -202,18 +201,16 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-    // ⚠️ REEMPLAZA ESTE OBJETO CON TUS DATOS REALES DE FIREBASE
- // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBlTx8zssrM9Rc517cXqXFI3kFqJYNBxa8",
-  authDomain: "sincroparejas.firebaseapp.com",
-  databaseURL: "https://sincroparejas-default-rtdb.firebaseio.com",
-  projectId: "sincroparejas",
-  storageBucket: "sincroparejas.firebasestorage.app",
-  messagingSenderId: "734804307178",
-  appId: "1:734804307178:web:1713f7bb2ce64c2405fb93",
-  measurementId: "G-G5K86N3ZB2"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlTx8zssrM9Rc517cXqXFI3kFqJYNBxa8",
+      authDomain: "sincroparejas.firebaseapp.com",
+      databaseURL: "https://sincroparejas-default-rtdb.firebaseio.com",
+      projectId: "sincroparejas",
+      storageBucket: "sincroparejas.firebasestorage.app",
+      messagingSenderId: "734804307178",
+      appId: "1:734804307178:web:1713f7bb2ce64c2405fb93",
+      measurementId: "G-G5K86N3ZB2"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
@@ -227,10 +224,10 @@ const firebaseConfig = {
       rsd: false
     };
 
-    // Establecer fecha de hoy como predeterminada en el selector
+    // Establecer fecha de hoy como predeterminada
     document.getElementById('fechaPeriodoInput').value = new Date().toISOString().split('T')[0];
 
-    // Escuchar cambios en Firebase
+    // Escuchar cambios en Firebase Realtime Database
     onValue(estadoRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -241,7 +238,13 @@ const firebaseConfig = {
       }
     });
 
-    // Registrar fecha seleccionada
+    // Funciones globales expuestas para los eventos inline HTML (onclick, onchange)
+    window.guardarYActualizar = function() {
+      estadoActual.fatiga = document.getElementById('fatigaCheck').checked;
+      estadoActual.rsd = document.getElementById('rsdCheck').checked;
+      set(estadoRef, estadoActual);
+    };
+
     window.registrarPeriodoPersonalizado = function() {
       const fechaSel = document.getElementById('fechaPeriodoInput').value;
       if (!fechaSel) return;
@@ -251,14 +254,14 @@ const firebaseConfig = {
       if (!estadoActual.historial.includes(fechaSel)) {
         estadoActual.historial.push(fechaSel);
         // Ordenar fechas de más reciente a más antigua
-        estadoActual.historial.sort((a, b) => new Date(b) - new Date(a));
+        estadoActual.historial.sort((a, b) => new Date(b.replace(/-/g, '/')) - new Date(a.replace(/-/g, '/')));
 
         // Recalcular promedio
         if (estadoActual.historial.length >= 2) {
           let sumaDias = 0;
           for (let i = 0; i < estadoActual.historial.length - 1; i++) {
-            const f1 = new Date(estadoActual.historial[i]);
-            const f2 = new Date(estadoActual.historial[i + 1]);
+            const f1 = new Date(estadoActual.historial[i].replace(/-/g, '/'));
+            const f2 = new Date(estadoActual.historial[i + 1].replace(/-/g, '/'));
             sumaDias += Math.abs(f1 - f2) / (1000 * 3600 * 24);
           }
           estadoActual.duracionPromedio = Math.round(sumaDias / (estadoActual.historial.length - 1));
@@ -266,13 +269,6 @@ const firebaseConfig = {
 
         window.guardarYActualizar();
       }
-    };
-
-    window.guardarYActualizar = function() {
-      estadoActual.fatiga = document.getElementById('fatigaCheck').checked;
-      estadoActual.rsd = document.getElementById('rsdCheck').checked;
-
-      set(estadoRef, estadoActual);
     };
 
     window.setBateria = function(nivel) {
@@ -299,12 +295,15 @@ const firebaseConfig = {
       document.getElementById('promedioText').innerText = `(Promedio: ${duracion} días)`;
 
       if (historial.length > 0) {
-        const ultimaFUM = new Date(historial[0] + 'T00:00:00');
+        // Corrección de parsing de fechas para compatibilidad cross-browser
+        const partesFecha = historial[0].split('-');
+        const ultimaFUM = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
+        
         const hoy = new Date();
         hoy.setHours(0,0,0,0);
         
         const difTiempo = hoy - ultimaFUM;
-        const diaCiclo = Math.floor(difTiempo / (1000 * 3600 * 24)) + 1;
+        const diaCiclo = Math.max(1, Math.floor(difTiempo / (1000 * 3600 * 24)) + 1);
         
         const prox = new Date(ultimaFUM);
         prox.setDate(prox.getDate() + duracion);
@@ -334,24 +333,28 @@ const firebaseConfig = {
         } else {
           fase = "4. Lútea / SPM"; color = "bg-amber-100 text-amber-800";
           tit = "⚠️ Caída Libre de Dopamina (Sensibilidad TDAH)"; 
-          txt = "La progesterona disminuye la efectividad de la dopamina. Aumenta la sobrecarga sensorial, la fatiga de decisión y el riesgo de RSD (disforia sensible a la reelección).";
+          txt = "La progesterona disminuye la efectividad de la dopamina. Aumenta la sobrecarga sensorial, la fatiga de decisión y el riesgo de RSD (disforia sensible al rechazo).";
         }
 
         document.getElementById('faseBadge').innerText = fase;
         document.getElementById('faseBadge').className = `text-xs font-bold px-3 py-1 rounded-full ${color}`;
-        document.getElementById('alertaTitulo').innerHTML = tit;
+        document.getElementById('alertaTitulo').innerHTML = `<span>🧠</span> ${tit}`;
         document.getElementById('alertaTexto').innerText = txt;
       }
 
-      // Historial
+      // Renderizar Historial
       const listaEl = document.getElementById('historialLista');
       if (historial.length > 0) {
-        listaEl.innerHTML = historial.map((f, idx) => `
-          <li class="py-2 flex justify-between items-center">
-            <span>Periodo #${historial.length - idx}</span>
-            <span class="font-semibold text-slate-700">${new Date(f + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-          </li>
-        `).join('');
+        listaEl.innerHTML = historial.map((f, idx) => {
+          const p = f.split('-');
+          const d = new Date(p[0], p[1] - 1, p[2]);
+          return `
+            <li class="py-2 flex justify-between items-center">
+              <span>Periodo #${historial.length - idx}</span>
+              <span class="font-semibold text-slate-700">${d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            </li>
+          `;
+        }).join('');
       } else {
         listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay registros aún.</li>`;
       }
