@@ -19,52 +19,52 @@
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <script>
     const ONESIGNAL_APP_ID = "f6af645a-6fd3-42f3-9221-24090e28478d";
-    const ONESIGNAL_REST_API_KEY = "4dna6lsc5ulg5e6vzqq3daenv";
     
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
-        appId: ONESIGNAL_APP_ID
+        appId: ONESIGNAL_APP_ID,
+        safari_web_id: "web.onesignal.auto.1713f7bb-2ce6-42f3-9221-24090e28478d",
+        notifyButton: {
+          enable: true,
+        },
       });
     });
 
-    // Asignación explícita a window para garantizar acceso desde onclick
-    window.enviarNotificacionPush = async function(titulo, mensaje) {
-      try {
-        const response = await fetch("https://onesignal.com/api/v1/notifications", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json; charset=utf-8",
-            "Authorization": `Basic ${ONESIGNAL_REST_API_KEY}`
-          },
-          body: JSON.stringify({
-            app_id: ONESIGNAL_APP_ID,
-            included_segments: ["Subscribed Users"],
-            headings: { es: titulo },
-            contents: { es: mensaje }
-          })
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-          alert("🔔 Notificación enviada con éxito.");
-        } else {
-          console.error("Error OneSignal:", data);
-          alert("⚠️ Error al enviar notificación: " + (data.errors ? data.errors[0] : "Revisa la consola"));
+    // Función para activar / solicitar notificaciones en el teléfono
+    window.activarNotificaciones = async function() {
+      if (window.OneSignal) {
+        try {
+          const permiso = await OneSignal.Notifications.requestPermission();
+          if (permiso) {
+            alert("✅ Notificaciones activadas con éxito en este dispositivo.");
+          } else {
+            alert("⚠️ No se concedieron los permisos de notificación.");
+          }
+        } catch (e) {
+          console.error(e);
+          alert("Asegúrate de estar abriendo la app desde Chrome/Safari directamente.");
         }
-      } catch (error) {
-        console.error("Error enviando notificación:", error);
-        alert("⚠️ Error de red al intentar enviar la notificación.");
+      } else {
+        alert("El SDK de notificaciones aún está cargando. Reintenta en 3 segundos.");
       }
     };
 
-    window.probarNotificacion = function() {
-      window.enviarNotificacionPush(
-        "💜 Alerta SincroPareja",
-        "¡Prueba exitosa! Las notificaciones entre teléfonos están funcionando correctamente."
-      );
+    // Prueba de notificación local dentro del navegador
+    window.probarNotificacion = async function() {
+      if (Notification.permission === "granted") {
+        new Notification("💜 Alerta SincroPareja", {
+          body: "¡Prueba exitosa! Las notificaciones locales y el sistema Push están activos en este teléfono.",
+          icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
+        });
+      } else {
+        alert("Primero debes hacer clic en 'Activar Notificaciones' para dar permiso.");
+        window.activarNotificaciones();
+      }
     };
   </script>
+
+
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12 select-none">
 
@@ -80,10 +80,13 @@
 
   <main class="max-w-md mx-auto p-4 space-y-6">
 
-    <!-- Botón de prueba de notificaciones -->
-    <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 text-center">
-      <button onclick="probarNotificacion()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
-        <span>🔔</span> Probar Notificación Push en Ambos Celulares
+    <!-- Sección Notificaciones -->
+    <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2 text-center">
+      <button onclick="activarNotificaciones()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
+        <span>🔔</span> 1. Activar Notificaciones Push en este Celular
+      </button>
+      <button onclick="probarNotificacion()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+        <span>📲</span> 2. Probar Notificación Local
       </button>
     </section>
 
