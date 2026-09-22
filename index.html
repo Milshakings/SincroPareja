@@ -205,8 +205,14 @@
 
   </main>
 
-  <!-- Firebase SDK v9 -->
+  <!-- Firebase SDK v9 & Lógica de la App -->
   <script type="module">
+    // 1. Detectar si el usuario abrió la app desde el navegador interno de Instagram o Facebook
+    const isInAppBrowser = /Instagram|FBAN|FBAV/i.test(navigator.userAgent);
+    if (isInAppBrowser) {
+      alert("⚠️ Para instalar la app y activar las notificaciones, por favor toca los tres puntos superiores (...) y selecciona 'Abrir en Chrome' o 'Abrir en el navegador'.");
+    }
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -382,5 +388,6 @@
       document.getElementById('accionMasculina').innerText = accion;
     }
   </script>
+  
 </body>
 </html>
