@@ -21,8 +21,7 @@
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
-        // ⚠️ REEMPLAZA CON TU APP ID DE ONESIGNAL
-        appId: "TU_ONESIGNAL_APP_ID",
+        appId: "TU_ONESIGNAL_APP_ID", // ⚠️ Reemplaza con tu App ID
       });
     });
   </script>
@@ -41,22 +40,18 @@
 
   <main class="max-w-md mx-auto p-4 space-y-6">
 
-    <!-- Configuración del Ciclo -->
-    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Configuración del Ciclo</h2>
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Último Periodo</label>
-          <input type="date" id="fumInput" onchange="guardarYActualizar()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Duración (Días)</label>
-          <input type="number" id="duracionInput" value="28" onchange="guardarYActualizar()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </div>
+    <!-- Registro Rápido de Nuevo Periodo -->
+    <section class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl flex justify-between items-center shadow-sm">
+      <div>
+        <h2 class="text-xs font-bold text-indigo-900 uppercase">¿Comenzó la menstruación hoy?</h2>
+        <p class="text-xs text-indigo-700">Guarda la fecha y calcula el promedio automáticamente.</p>
       </div>
+      <button onclick="registrarNuevoPeriodo()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold px-3 py-2.5 rounded-xl shadow transition-all">
+        🩸 Registrar Hoy
+      </button>
     </section>
 
-    <!-- Estado Actual y Alerta Hormonal -->
+    <!-- Estado Actual y Alerta Hormonal (Cambia día a día) -->
     <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
       <div class="flex justify-between items-start">
         <div>
@@ -64,8 +59,9 @@
           <h3 id="diaCicloText" class="text-2xl font-black text-slate-800 mt-2">Día --</h3>
         </div>
         <div class="text-right">
-          <span class="text-xs text-slate-400 block">Próximo periodo</span>
+          <span class="text-xs text-slate-400 block">Próximo periodo est.</span>
           <span id="proxPeriodoText" class="text-sm font-semibold text-slate-700">--/--/----</span>
+          <span id="promedioText" class="text-[10px] text-slate-400 block mt-0.5">(Promedio: 28 días)</span>
         </div>
       </div>
 
@@ -117,9 +113,17 @@
       <p id="accionMasculina" class="text-sm font-medium leading-relaxed">Esperando datos...</p>
     </section>
 
+    <!-- Historial de Periodos Guardados -->
+    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Historial de Periodos</h2>
+      <ul id="historialLista" class="divide-y divide-slate-100 text-xs text-slate-600">
+        <li class="py-2 text-slate-400 italic">No hay periodos registrados aún.</li>
+      </ul>
+    </section>
+
   </main>
 
-  <!-- Módulos de Firebase SDK v9 -->
+  <!-- Firebase SDK v9 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -140,33 +144,57 @@
     const estadoRef = ref(db, 'estado_pareja');
 
     let estadoActual = {
-      fum: new Date().toISOString().split('T')[0],
-      duracion: 28,
+      historial: [], // Guarda un arreglo de fechas: ["2026-08-20", "2026-09-17"]
+      duracionPromedio: 28,
       bateria: 'Media',
       fatiga: false,
       rsd: false
     };
 
-    // Escuchar cambios en tiempo real
+    // Escuchar cambios en Firebase en tiempo real
     onValue(estadoRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        estadoActual = data;
-        renderApp(data);
+        estadoActual = Object.assign({ historial: [], duracionPromedio: 28 }, data);
+        renderApp(estadoActual);
         document.getElementById('syncStatus').innerText = "🟢 Sincronizado";
         document.getElementById('syncStatus').className = "text-xs bg-emerald-500 px-2.5 py-1 rounded-full font-medium shadow-sm";
       }
     });
 
-    // Guardar cambios en Firebase y disparar notificación
+    // Registrar inicio de periodo
+    window.registrarNuevoPeriodo = function() {
+      const hoyStr = new Date().toISOString().split('T')[0];
+      
+      if (!estadoActual.historial) estadoActual.historial = [];
+      
+      // Evitar duplicar el registro si presiona dos veces el mismo día
+      if (!estadoActual.historial.includes(hoyStr)) {
+        estadoActual.historial.unshift(hoyStr); // Agregar al inicio
+        
+        // Calcular nuevo promedio si hay 2 o más registros
+        if (estadoActual.historial.length >= 2) {
+          let sumaDias = 0;
+          let intervalos = 0;
+          for (let i = 0; i < estadoActual.historial.length - 1; i++) {
+            const fecha1 = new Date(estadoActual.historial[i]);
+            const fecha2 = new Date(estadoActual.historial[i + 1]);
+            const diff = Math.abs(fecha1 - fecha2) / (1000 * 3600 * 24);
+            sumaDias += diff;
+            intervalos++;
+          }
+          estadoActual.duracionPromedio = Math.round(sumaDias / intervalos);
+        }
+
+        window.guardarYActualizar();
+      }
+    };
+
     window.guardarYActualizar = function() {
-      estadoActual.fum = document.getElementById('fumInput').value;
-      estadoActual.duracion = parseInt(document.getElementById('duracionInput').value) || 28;
       estadoActual.fatiga = document.getElementById('fatigaCheck').checked;
       estadoActual.rsd = document.getElementById('rsdCheck').checked;
 
       set(estadoRef, estadoActual);
-      enviarNotificacionPush(estadoActual);
     };
 
     window.setBateria = function(nivel) {
@@ -174,46 +202,7 @@
       window.guardarYActualizar();
     };
 
-    // Envío automático de notificaciones vía OneSignal REST API
-    async function enviarNotificacionPush(data) {
-      const REST_API_KEY = "TU_ONESIGNAL_REST_API_KEY"; // ⚠️ Tu clave REST API
-      const APP_ID = "TU_ONESIGNAL_APP_ID";             // ⚠️ Tu App ID
-
-      if (REST_API_KEY === "TU_ONESIGNAL_REST_API_KEY") return; // Si no está configurado, ignora
-
-      let mensaje = "";
-      if (data.rsd && data.fatiga) {
-        mensaje = "⚠️ Ella activó Modo Protección Máxima (Fatiga de decisión + RSD).";
-      } else if (data.fatiga) {
-        mensaje = "🍲 Ella registró Fatiga de Decisión Activa para hoy.";
-      } else if (data.bateria === "Baja") {
-        mensaje = "🪫 Batería Social/Sensorial registrada en 20%.";
-      }
-
-      if (mensaje) {
-        try {
-          await fetch("https://onesignal.com/api/v1/notifications", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json; charset=utf-8",
-              "Authorization": `Basic ${REST_API_KEY}`
-            },
-            body: JSON.stringify({
-              app_id: APP_ID,
-              included_segments: ["Subscribed Users"],
-              headings: { "es": "💜 SincroPareja: Actualización" },
-              contents: { "es": mensaje }
-            })
-          });
-        } catch (e) {
-          console.error("Error al enviar push:", e);
-        }
-      }
-    }
-
     function renderApp(data) {
-      document.getElementById('fumInput').value = data.fum || '';
-      document.getElementById('duracionInput').value = data.duracion || 28;
       document.getElementById('fatigaCheck').checked = !!data.fatiga;
       document.getElementById('rsdCheck').checked = !!data.rsd;
 
@@ -227,13 +216,21 @@
         }
       });
 
-      // Cálculo de ciclo
-      const fum = new Date(data.fum);
-      const hoy = new Date();
-      if (!isNaN(fum.getTime())) {
-        const diaCiclo = Math.floor((hoy - fum) / (1000 * 3600 * 24)) + 1;
-        const prox = new Date(fum);
-        prox.setDate(fum.getDate() + parseInt(data.duracion));
+      // Cálculo dinámico del ciclo basado en el último periodo guardado
+      const historial = data.historial || [];
+      const duracion = data.duracionPromedio || 28;
+      document.getElementById('promedioText').innerText = `(Promedio: ${duracion} días)`;
+
+      if (historial.length > 0) {
+        const ultimaFUM = new Date(historial[0]);
+        const hoy = new Date();
+        
+        // Calcular día actual ajustando zona horaria local
+        const difTiempo = hoy.setHours(0,0,0,0) - ultimaFUM.setHours(0,0,0,0);
+        const diaCiclo = Math.floor(difTiempo / (1000 * 3600 * 24)) + 1;
+        
+        const prox = new Date(historial[0]);
+        prox.setDate(prox.getDate() + duracion);
 
         document.getElementById('diaCicloText').innerText = `Día ${diaCiclo}`;
         document.getElementById('proxPeriodoText').innerText = prox.toLocaleDateString('es-ES');
@@ -245,7 +242,7 @@
         } else if (diaCiclo <= 13) {
           fase = "2. Folicular"; color = "bg-emerald-100 text-emerald-700";
           tit = "🌱 Subida de Estrógenos"; txt = "Aumenta la dopamina y creatividad. Excelente momento para actividades juntos.";
-        } else if (diaCiclo <= 16) {
+        } else if (diaCiclo <= (duracion - 12)) {
           fase = "3. Ovulatoria"; color = "bg-sky-100 text-sky-700";
           tit = "✨ Ventana Fértil"; txt = "Pico hormonal de fertilidad y energía.";
         } else {
@@ -257,6 +254,19 @@
         document.getElementById('faseBadge').className = `text-xs font-bold px-3 py-1 rounded-full ${color}`;
         document.getElementById('alertaTitulo').innerHTML = tit;
         document.getElementById('alertaTexto').innerText = txt;
+      }
+
+      // Renderizar lista del historial
+      const listaEl = document.getElementById('historialLista');
+      if (historial.length > 0) {
+        listaEl.innerHTML = historial.map((f, idx) => `
+          <li class="py-2 flex justify-between items-center">
+            <span>Periodo ${historial.length - idx}</span>
+            <span class="font-semibold text-slate-700">${new Date(f).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+          </li>
+        `).join('');
+      } else {
+        listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay periodos registrados aún. Haz clic en "Registrar Hoy".</li>`;
       }
 
       // Guía para Él
