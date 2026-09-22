@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SincroPareja</title>
 
-  <!-- Configuración PWA (Apariencia de App Nativa) -->
+  <!-- Configuración PWA -->
   <meta name="theme-color" content="#4f46e5">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -40,18 +40,21 @@
 
   <main class="max-w-md mx-auto p-4 space-y-6">
 
-    <!-- Registro Rápido de Nuevo Periodo -->
-    <section class="bg-indigo-50 border border-indigo-100 p-4 rounded-2xl flex justify-between items-center shadow-sm">
+    <!-- Tarjeta: Registrar Inicio de Periodo con Fecha Flexible -->
+    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
       <div>
-        <h2 class="text-xs font-bold text-indigo-900 uppercase">¿Comenzó la menstruación hoy?</h2>
-        <p class="text-xs text-indigo-700">Guarda la fecha y calcula el promedio automáticamente.</p>
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Registrar inicio de periodo</h2>
+        <p class="text-xs text-slate-500 mt-0.5">¿Qué día empezó el periodo menstrual?</p>
       </div>
-      <button onclick="registrarNuevoPeriodo()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold px-3 py-2.5 rounded-xl shadow transition-all">
-        🩸 Registrar Hoy
-      </button>
+      <div class="flex gap-2">
+        <input type="date" id="fechaPeriodoInput" class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-700 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+        <button onclick="registrarPeriodoPersonalizado()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all whitespace-nowrap">
+          🩸 Guardar
+        </button>
+      </div>
     </section>
 
-    <!-- Estado Actual y Alerta Hormonal (Cambia día a día) -->
+    <!-- Gráfico Visual de Representación del Ciclo ("Aquí vamos") -->
     <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
       <div class="flex justify-between items-start">
         <div>
@@ -65,9 +68,41 @@
         </div>
       </div>
 
+      <!-- Barra de Progreso Gráfica -->
+      <div class="space-y-1.5 pt-2">
+        <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
+          <span>Línea de tiempo del ciclo</span>
+          <span id="porcentajeTexto" class="text-indigo-600 font-extrabold">0%</span>
+        </div>
+        
+        <!-- Contenedor del Gráfico -->
+        <div class="relative w-full h-7 bg-slate-100 rounded-xl overflow-hidden flex border border-slate-200/60 p-0.5">
+          <!-- Bloques de Fases Biológicas -->
+          <div title="Menstrual" class="h-full bg-rose-200/80 rounded-l-lg" style="width: 18%;"></div>
+          <div title="Folicular" class="h-full bg-emerald-200/80" style="width: 28%;"></div>
+          <div title="Ovulatoria" class="h-full bg-sky-200/80" style="width: 11%;"></div>
+          <div title="Lútea / SPM" class="h-full bg-amber-200/80 rounded-r-lg" style="width: 43%;"></div>
+
+          <!-- Indicador "Aquí Vamos" -->
+          <div id="indicadorGrafico" class="absolute top-0 bottom-0 w-8 -ml-4 flex flex-col items-center justify-center transition-all duration-500" style="left: 0%;">
+            <div class="bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md whitespace-nowrap animate-pulse">
+              📍 Aquí vamos
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between text-[9px] font-semibold text-slate-400 px-1 pt-1">
+          <span class="text-rose-600">🩸 Menstrual</span>
+          <span class="text-emerald-600">🌱 Folicular</span>
+          <span class="text-sky-600">✨ Ovulatoria</span>
+          <span class="text-amber-600">⚠️ Lútea / SPM</span>
+        </div>
+      </div>
+
+      <!-- Impacto TDAH & Neurología -->
       <div id="alertaBox" class="p-4 rounded-xl border border-slate-100 bg-slate-50 space-y-1">
         <div class="flex items-center gap-2 font-bold text-sm" id="alertaTitulo">
-          <span>🧠</span> Estado Neurológico y Hormonal
+          <span>🧠</span> Impacto Neurobiológico & TDAH
         </div>
         <p id="alertaTexto" class="text-xs leading-relaxed text-slate-600">Cargando...</p>
       </div>
@@ -107,17 +142,17 @@
       </div>
     </section>
 
-    <!-- Guía de Acción Directa para Él -->
+    <!-- Opciones de Acción / Guía Directa para Él -->
     <section class="bg-indigo-900 text-white p-5 rounded-2xl shadow-md space-y-3">
-      <h2 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Acción Sugerida para Él</h2>
+      <h2 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Opciones de Acción para Él</h2>
       <p id="accionMasculina" class="text-sm font-medium leading-relaxed">Esperando datos...</p>
     </section>
 
-    <!-- Historial de Periodos Guardados -->
+    <!-- Historial de Periodos -->
     <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Historial de Periodos</h2>
+      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Historial de Fechas Guardadas</h2>
       <ul id="historialLista" class="divide-y divide-slate-100 text-xs text-slate-600">
-        <li class="py-2 text-slate-400 italic">No hay periodos registrados aún.</li>
+        <li class="py-2 text-slate-400 italic">No hay registros aún.</li>
       </ul>
     </section>
 
@@ -144,14 +179,17 @@
     const estadoRef = ref(db, 'estado_pareja');
 
     let estadoActual = {
-      historial: [], // Guarda un arreglo de fechas: ["2026-08-20", "2026-09-17"]
+      historial: [],
       duracionPromedio: 28,
       bateria: 'Media',
       fatiga: false,
       rsd: false
     };
 
-    // Escuchar cambios en Firebase en tiempo real
+    // Establecer fecha de hoy como predeterminada en el selector
+    document.getElementById('fechaPeriodoInput').value = new Date().toISOString().split('T')[0];
+
+    // Escuchar cambios en Firebase
     onValue(estadoRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -162,28 +200,27 @@
       }
     });
 
-    // Registrar inicio de periodo
-    window.registrarNuevoPeriodo = function() {
-      const hoyStr = new Date().toISOString().split('T')[0];
-      
+    // Registrar fecha seleccionada
+    window.registrarPeriodoPersonalizado = function() {
+      const fechaSel = document.getElementById('fechaPeriodoInput').value;
+      if (!fechaSel) return;
+
       if (!estadoActual.historial) estadoActual.historial = [];
       
-      // Evitar duplicar el registro si presiona dos veces el mismo día
-      if (!estadoActual.historial.includes(hoyStr)) {
-        estadoActual.historial.unshift(hoyStr); // Agregar al inicio
-        
-        // Calcular nuevo promedio si hay 2 o más registros
+      if (!estadoActual.historial.includes(fechaSel)) {
+        estadoActual.historial.push(fechaSel);
+        // Ordenar fechas de más reciente a más antigua
+        estadoActual.historial.sort((a, b) => new Date(b) - new Date(a));
+
+        // Recalcular promedio
         if (estadoActual.historial.length >= 2) {
           let sumaDias = 0;
-          let intervalos = 0;
           for (let i = 0; i < estadoActual.historial.length - 1; i++) {
-            const fecha1 = new Date(estadoActual.historial[i]);
-            const fecha2 = new Date(estadoActual.historial[i + 1]);
-            const diff = Math.abs(fecha1 - fecha2) / (1000 * 3600 * 24);
-            sumaDias += diff;
-            intervalos++;
+            const f1 = new Date(estadoActual.historial[i]);
+            const f2 = new Date(estadoActual.historial[i + 1]);
+            sumaDias += Math.abs(f1 - f2) / (1000 * 3600 * 24);
           }
-          estadoActual.duracionPromedio = Math.round(sumaDias / intervalos);
+          estadoActual.duracionPromedio = Math.round(sumaDias / (estadoActual.historial.length - 1));
         }
 
         window.guardarYActualizar();
@@ -206,7 +243,7 @@
       document.getElementById('fatigaCheck').checked = !!data.fatiga;
       document.getElementById('rsdCheck').checked = !!data.rsd;
 
-      // Botones de batería
+      // Botones batería
       ['Baja', 'Media', 'Alta'].forEach(b => {
         const btn = document.getElementById(`btnBat${b}`);
         if (data.bateria === b) {
@@ -216,38 +253,47 @@
         }
       });
 
-      // Cálculo dinámico del ciclo basado en el último periodo guardado
       const historial = data.historial || [];
       const duracion = data.duracionPromedio || 28;
       document.getElementById('promedioText').innerText = `(Promedio: ${duracion} días)`;
 
       if (historial.length > 0) {
-        const ultimaFUM = new Date(historial[0]);
+        const ultimaFUM = new Date(historial[0] + 'T00:00:00');
         const hoy = new Date();
+        hoy.setHours(0,0,0,0);
         
-        // Calcular día actual ajustando zona horaria local
-        const difTiempo = hoy.setHours(0,0,0,0) - ultimaFUM.setHours(0,0,0,0);
+        const difTiempo = hoy - ultimaFUM;
         const diaCiclo = Math.floor(difTiempo / (1000 * 3600 * 24)) + 1;
         
-        const prox = new Date(historial[0]);
+        const prox = new Date(ultimaFUM);
         prox.setDate(prox.getDate() + duracion);
 
         document.getElementById('diaCicloText').innerText = `Día ${diaCiclo}`;
         document.getElementById('proxPeriodoText').innerText = prox.toLocaleDateString('es-ES');
 
+        // Porcentaje y posición en gráfico
+        let porcentaje = Math.min(Math.max(Math.round((diaCiclo / duracion) * 100), 2), 98);
+        document.getElementById('porcentajeTexto').innerText = `${porcentaje}%`;
+        document.getElementById('indicadorGrafico').style.left = `${porcentaje}%`;
+
+        // Fases y relación TDAH
         let fase = "", color = "", tit = "", txt = "";
         if (diaCiclo <= 5) {
           fase = "1. Menstrual"; color = "bg-rose-100 text-rose-700";
-          tit = "🩸 Caída Hormonal"; txt = "Baja energía física. Priorizar descanso e hidratación.";
+          tit = "🩸 Caída de Estrógenos y Dopamina"; 
+          txt = "Baja disponibilidad ejecutiva. El cansancio físico acentúa la neblina mental y la procrastinación en el TDAH.";
         } else if (diaCiclo <= 13) {
           fase = "2. Folicular"; color = "bg-emerald-100 text-emerald-700";
-          tit = "🌱 Subida de Estrógenos"; txt = "Aumenta la dopamina y creatividad. Excelente momento para actividades juntos.";
+          tit = "🌱 Aumento de Dopamina"; 
+          txt = "Pico de claridad mental y energía. Mejor momento del mes para organizar, iniciar proyectos o conversar temas complejos.";
         } else if (diaCiclo <= (duracion - 12)) {
           fase = "3. Ovulatoria"; color = "bg-sky-100 text-sky-700";
-          tit = "✨ Ventana Fértil"; txt = "Pico hormonal de fertilidad y energía.";
+          tit = "✨ Cúspide Hormonal"; 
+          txt = "Alta sociabilidad y energía física. El cerebro responde rápido a los estímulos.";
         } else {
           fase = "4. Lútea / SPM"; color = "bg-amber-100 text-amber-800";
-          tit = "⚠️ Fase Lútea (Progesterona)"; txt = "Descenso de dopamina. Mayor sensibilidad a sobrecarga sensorial y TDAH.";
+          tit = "⚠️ Caída Libre de Dopamina (Sensibilidad TDAH)"; 
+          txt = "La progesterona disminuye la efectividad de la dopamina. Aumenta la sobrecarga sensorial, la fatiga de decisión y el riesgo de RSD (disforia sensible a la reelección).";
         }
 
         document.getElementById('faseBadge').innerText = fase;
@@ -256,29 +302,29 @@
         document.getElementById('alertaTexto').innerText = txt;
       }
 
-      // Renderizar lista del historial
+      // Historial
       const listaEl = document.getElementById('historialLista');
       if (historial.length > 0) {
         listaEl.innerHTML = historial.map((f, idx) => `
           <li class="py-2 flex justify-between items-center">
-            <span>Periodo ${historial.length - idx}</span>
-            <span class="font-semibold text-slate-700">${new Date(f).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <span>Periodo #${historial.length - idx}</span>
+            <span class="font-semibold text-slate-700">${new Date(f + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
           </li>
         `).join('');
       } else {
-        listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay periodos registrados aún. Haz clic en "Registrar Hoy".</li>`;
+        listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay registros aún.</li>`;
       }
 
-      // Guía para Él
-      let accion = "🟢 Estado Fluido: Buen momento para coordinar metas o compartir rutinas.";
+      // Opciones de acción para él
+      let accion = "🟢 Estado Fluido: Momento ideal para coordinar actividades o compartir tiempo de calidad.";
       if (data.rsd && data.fatiga) {
-        accion = "🛡️ MODO PROTECCIÓN MÁXIMA: Alta saturación y sensibilidad. Toma el control práctico del hogar sin hacerle preguntas de opción múltiple.";
+        accion = "🛡️ OPCIÓN RECOMENDADA: Cobertura total. No hagas preguntas de opción múltiple, gestiona la cena/hogar directamente y valida sus emociones sin juzgar.";
       } else if (data.fatiga) {
-        accion = "🍲 FATIGA DE DECISIÓN ACTIVA: Evita preguntarle qué hacer/cenar. Asume la decisión tú directamente.";
+        accion = "🍲 OPCIÓN RECOMENDADA: Reduce su carga cognitiva. Elige tú qué comer/hacer y ofrécele opciones cerradas (ej. ¿Prefieres A o B?).";
       } else if (data.rsd) {
-        accion = "💬 Sensibilidad Emocional (RSD): Ofrece contención y afirmación de seguridad ('estoy aquí, somos un equipo'). Evita el tono crítico.";
+        accion = "💬 OPCIÓN RECOMENDADA: Afirmación de seguridad. Ofrece respuestas con tono afable para mitigar la sensación de rechazo percibido por el TDAH.";
       } else if (data.bateria === 'Baja') {
-        accion = "🪫 Batería Baja: Facilítale un espacio tranquilo libre de exigencias o interacciones sociales externas.";
+        accion = "🪫 OPCIÓN RECOMENDADA: Espacio de bajo estímulo. Desactiva ruidos/luces fuertes y evita hacerle demandas inmediatas.";
       }
       document.getElementById('accionMasculina').innerText = accion;
     }
