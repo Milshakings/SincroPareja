@@ -66,9 +66,9 @@
     };
   </script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-16 select-none">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-20 select-none">
 
-  <!-- Encabezado -->
+  <!-- Encabezado Fijo -->
   <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
     <div class="max-w-md mx-auto flex justify-between items-center">
       <h1 class="text-xl font-bold flex items-center gap-2">
@@ -78,221 +78,237 @@
     </div>
   </header>
 
+  <!-- Navegación por Pestañas (Tabs) -->
+  <nav class="max-w-md mx-auto px-4 pt-3 pb-1">
+    <div class="grid grid-cols-3 gap-1 bg-slate-200/80 p-1 rounded-2xl shadow-inner text-xs font-bold text-slate-600">
+      <button onclick="cambiarTab('ciclo')" id="tabCiclo" class="py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center gap-1">
+        <span>🩸</span> Ciclo & TDAH
+      </button>
+      <button onclick="cambiarTab('peliculas')" id="tabPeliculas" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex items-center justify-center gap-1">
+        <span>🎬</span> Películas
+      </button>
+      <button onclick="cambiarTab('museos')" id="tabMuseos" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex items-center justify-center gap-1">
+        <span>🏛️</span> Museos
+      </button>
+    </div>
+  </nav>
+
   <main class="max-w-md mx-auto p-4 space-y-6">
 
-    <!-- Sección Notificaciones -->
-    <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2 text-center">
-      <button onclick="activarNotificaciones()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
-        <span>🔔</span> Activar Notificaciones Push
-      </button>
-      <button onclick="probarNotificacion()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-        <span>📲</span> Probar Notificación Local
-      </button>
-    </section>
+    <!-- ================= VISTA 1: CICLO & TDAH ================= -->
+    <div id="vistaCiclo" class="space-y-6">
 
-    <!-- Tarjeta: Registrar Inicio de Periodo -->
-    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-      <div>
-        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Registrar inicio de periodo</h2>
-        <p class="text-xs text-slate-500 mt-0.5">¿Qué día empezó el periodo menstrual?</p>
-      </div>
-      <div class="flex gap-2">
-        <input type="date" id="fechaPeriodoInput" class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-700 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
-        <button onclick="registrarPeriodoPersonalizado()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all whitespace-nowrap">
-          🩸 Guardar
+      <!-- Sección Notificaciones -->
+      <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2 text-center">
+        <button onclick="activarNotificaciones()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
+          <span>🔔</span> Activar Notificaciones Push
         </button>
-      </div>
-    </section>
+        <button onclick="probarNotificacion()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+          <span>📲</span> Probar Notificación Local
+        </button>
+      </section>
 
-    <!-- Gráfico Visual de Representación del Ciclo -->
-    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-      <div class="flex justify-between items-start">
+      <!-- Tarjeta: Registrar Inicio de Periodo -->
+      <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
         <div>
-          <span id="faseBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-600">Calculando...</span>
-          <h3 id="diaCicloText" class="text-2xl font-black text-slate-800 mt-2">Día --</h3>
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Registrar inicio de periodo</h2>
+          <p class="text-xs text-slate-500 mt-0.5">¿Qué día empezó el periodo menstrual?</p>
         </div>
-        <div class="text-right">
-          <span class="text-xs text-slate-400 block">Próximo periodo est.</span>
-          <span id="proxPeriodoText" class="text-sm font-semibold text-slate-700">--/--/----</span>
-          <span id="promedioText" class="text-[10px] text-slate-400 block mt-0.5">(Promedio: 28 días)</span>
+        <div class="flex gap-2">
+          <input type="date" id="fechaPeriodoInput" class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-700 flex-1 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+          <button onclick="registrarPeriodoPersonalizado()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow transition-all whitespace-nowrap">
+            🩸 Guardar
+          </button>
         </div>
-      </div>
+      </section>
 
-      <!-- Barra de Progreso Gráfica -->
-      <div class="space-y-1.5 pt-2">
-        <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
-          <span>Línea de tiempo del ciclo</span>
-          <span id="porcentajeTexto" class="text-indigo-600 font-extrabold">0%</span>
+      <!-- Gráfico Visual de Representación del Ciclo -->
+      <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <span id="faseBadge" class="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-600">Calculando...</span>
+            <h3 id="diaCicloText" class="text-2xl font-black text-slate-800 mt-2">Día --</h3>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400 block">Próximo periodo est.</span>
+            <span id="proxPeriodoText" class="text-sm font-semibold text-slate-700">--/--/----</span>
+            <span id="promedioText" class="text-[10px] text-slate-400 block mt-0.5">(Promedio: 28 días)</span>
+          </div>
         </div>
-        
-        <div class="relative w-full h-7 bg-slate-100 rounded-xl overflow-hidden flex border border-slate-200/60 p-0.5">
-          <div title="Menstrual" class="h-full bg-rose-200/80 rounded-l-lg" style="width: 18%;"></div>
-          <div title="Folicular" class="h-full bg-emerald-200/80" style="width: 28%;"></div>
-          <div title="Ovulatoria" class="h-full bg-sky-200/80" style="width: 11%;"></div>
-          <div title="Lútea / SPM" class="h-full bg-amber-200/80 rounded-r-lg" style="width: 43%;"></div>
 
-          <div id="indicadorGrafico" class="absolute top-0 bottom-0 w-8 -ml-4 flex flex-col items-center justify-center transition-all duration-500" style="left: 0%;">
-            <div class="bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md whitespace-nowrap animate-pulse">
-              📍 Aquí vamos
+        <!-- Barra de Progreso Gráfica -->
+        <div class="space-y-1.5 pt-2">
+          <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
+            <span>Línea de tiempo del ciclo</span>
+            <span id="porcentajeTexto" class="text-indigo-600 font-extrabold">0%</span>
+          </div>
+          
+          <div class="relative w-full h-7 bg-slate-100 rounded-xl overflow-hidden flex border border-slate-200/60 p-0.5">
+            <div title="Menstrual" class="h-full bg-rose-200/80 rounded-l-lg" style="width: 18%;"></div>
+            <div title="Folicular" class="h-full bg-emerald-200/80" style="width: 28%;"></div>
+            <div title="Ovulatoria" class="h-full bg-sky-200/80" style="width: 11%;"></div>
+            <div title="Lútea / SPM" class="h-full bg-amber-200/80 rounded-r-lg" style="width: 43%;"></div>
+
+            <div id="indicadorGrafico" class="absolute top-0 bottom-0 w-8 -ml-4 flex flex-col items-center justify-center transition-all duration-500" style="left: 0%;">
+              <div class="bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md whitespace-nowrap animate-pulse">
+                📍 Aquí vamos
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="flex justify-between text-[9px] font-semibold text-slate-400 px-1 pt-1">
-          <span class="text-rose-600">🩸 Menstrual</span>
-          <span class="text-emerald-600">🌱 Folicular</span>
-          <span class="text-sky-600">✨ Ovulatoria</span>
-          <span class="text-amber-600">⚠️ Lútea / SPM</span>
-        </div>
-      </div>
-
-      <!-- Impacto TDAH & Neurología -->
-      <div id="alertaBox" class="p-4 rounded-xl border border-slate-100 bg-slate-50 space-y-1">
-        <div class="flex items-center gap-2 font-bold text-sm" id="alertaTitulo">
-          <span>🧠</span> Impacto Neurobiológico & TDAH
-        </div>
-        <p id="alertaTexto" class="text-xs leading-relaxed text-slate-600">Cargando...</p>
-      </div>
-
-      <!-- Advertencia & Autocuidado TDAH para Ella -->
-      <div id="advertenciaEllaBox" class="p-4 rounded-xl border border-rose-200 bg-rose-50 space-y-1.5">
-        <div class="flex items-center gap-2 font-bold text-xs text-rose-800">
-          <span>👑</span> Advertencia & Recomendaciones de Autocuidado para Ella
-        </div>
-        <p id="advertenciaEllaTexto" class="text-xs leading-relaxed text-rose-700 font-medium">Cargando recomendaciones...</p>
-      </div>
-    </section>
-
-    <!-- Check-in Diario (Ella) -->
-    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Check-in Diario (Ella)</h2>
-      
-      <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-2">Batería Social y Sensorial</label>
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="setBateria('Baja')" id="btnBatBaja" class="bat-btn border border-slate-200 p-2.5 rounded-xl text-center transition-all">
-            <span class="block text-lg">🪫</span>
-            <span class="text-xs font-medium">Baja (20%)</span>
-          </button>
-          <button onclick="setBateria('Media')" id="btnBatMedia" class="bat-btn border border-slate-200 p-2.5 rounded-xl text-center transition-all">
-            <span class="block text-lg">🔋</span>
-            <span class="text-xs font-medium">Media (50%)</span>
-          </button>
-          <button onclick="setBateria('Alta')" id="btnBatAlta" class="bat-btn border border-slate-200 p-2.5 rounded-xl text-center transition-all">
-            <span class="block text-lg">⚡</span>
-            <span class="text-xs font-medium">Alta (100%)</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="space-y-3 pt-2">
-        <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
-          <span class="text-xs font-medium text-slate-700">🧠 Fatiga de Decisión (Cerebro saturado)</span>
-          <input type="checkbox" id="fatigaCheck" onchange="guardarYActualizar()" class="w-4 h-4 accent-indigo-600 rounded">
-        </label>
-        <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
-          <span class="text-xs font-medium text-slate-700">🛡️ Sensibilidad / RSD (Vulnerabilidad alta)</span>
-          <input type="checkbox" id="rsdCheck" onchange="guardarYActualizar()" class="w-4 h-4 accent-indigo-600 rounded">
-        </label>
-      </div>
-    </section>
-
-    <!-- Opciones de Acción para Él -->
-    <section class="bg-indigo-900 text-white p-5 rounded-2xl shadow-md space-y-3">
-      <h2 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Opciones de Acción para Él</h2>
-      <p id="accionMasculina" class="text-sm font-medium leading-relaxed">Esperando datos...</p>
-    </section>
-
-    <!-- Ventana: Películas en Pareja -->
-    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-        <span>🎬</span> Películas Vistas en Pareja
-      </h2>
-      
-      <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-        <input type="text" id="peliTitulo" list="sugerenciasPelis" placeholder="Título de la película..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-        <datalist id="sugerenciasPelis">
-          <option value="Orgullo y Prejuicio"></option>
-          <option value="El Viaje de Chihiro"></option>
-          <option value="Eterno Resplandor de una Mente sin Recuerdos"></option>
-          <option value="Interstellar"></option>
-          <option value="La La Land"></option>
-          <option value="About Time"></option>
-        </datalist>
-
-        <div class="flex items-center gap-2">
-          <select id="peliAvatar" class="bg-white border border-slate-200 rounded-lg p-2 text-xs">
-            <option value="🍿">🍿 Pochoclos</option>
-            <option value="🎥">🎥 Cine</option>
-            <option value="❤️">❤️ Romántica</option>
-            <option value="🌌">🌌 Sci-Fi</option>
-            <option value="👻">👻 Terror</option>
-            <option value="🧩">🧩 Animación</option>
-          </select>
-
-          <input type="date" id="peliFecha" class="bg-white border border-slate-200 rounded-lg p-2 text-xs flex-1">
+        <!-- Impacto TDAH & Neurología -->
+        <div id="alertaBox" class="p-4 rounded-xl border border-slate-100 bg-slate-50 space-y-1">
+          <div class="flex items-center gap-2 font-bold text-sm" id="alertaTitulo">
+            <span>🧠</span> Impacto Neurobiológico & TDAH
+          </div>
+          <p id="alertaTexto" class="text-xs leading-relaxed text-slate-600">Cargando...</p>
         </div>
 
-        <div class="flex items-center justify-between pt-1">
-          <label class="flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
-            <input type="checkbox" id="peliOmitirFecha" onchange="togglePeliFecha()" class="w-3.5 h-3.5 accent-indigo-600 rounded">
-            No recuerdo la fecha
+        <!-- Advertencia & Autocuidado TDAH para Ella -->
+        <div id="advertenciaEllaBox" class="p-4 rounded-xl border border-rose-200 bg-rose-50 space-y-1.5">
+          <div class="flex items-center gap-2 font-bold text-xs text-rose-800">
+            <span>👑</span> Advertencia & Recomendaciones de Autocuidado para Ella
+          </div>
+          <p id="advertenciaEllaTexto" class="text-xs leading-relaxed text-rose-700 font-medium">Cargando recomendaciones...</p>
+        </div>
+      </section>
+
+      <!-- Check-in Diario (Ella) -->
+      <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Check-in Diario (Ella)</h2>
+        
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-2">Batería Social y Sensorial</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setBateria('Baja')" id="btnBatBaja" class="bat-btn border border-slate-200 p-2.5 rounded-xl text-center transition-all">
+              <span class="block text-lg">🪫</span>
+              <span class="text-xs font-medium">Baja (20%)</span>
+            </button>
+            <button onclick="setBateria('Media')" id="btnBatMedia" class="bat-btn border border-slate-200 p-2.5 rounded-xl text-center transition-all">
+              <span class="block text-lg">🔋</span>
+              <span class="text-xs font-medium">Media (50%)</span>
+            </button>
+            <button onclick="setBateria('Alta')" id="btnBatAlta" class="bat-btn border border-slate-200 p-2.5 rounded-xl text-center transition-all">
+              <span class="block text-lg">⚡</span>
+              <span class="text-xs font-medium">Alta (100%)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+            <span class="text-xs font-medium text-slate-700">🧠 Fatiga de Decisión (Cerebro saturado)</span>
+            <input type="checkbox" id="fatigaCheck" onchange="guardarYActualizar()" class="w-4 h-4 accent-indigo-600 rounded">
           </label>
-          <button onclick="agregarPelicula()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all">
-            + Agregar
-          </button>
-        </div>
-      </div>
-
-      <ul id="pelisLista" class="divide-y divide-slate-100 text-xs space-y-1">
-        <li class="py-2 text-slate-400 italic">No han guardado películas aún.</li>
-      </ul>
-    </section>
-
-    <!-- Ventana: Museos y Salidas Culturales -->
-    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-        <span>🏛️</span> Museos y Paseos Vistos
-      </h2>
-      
-      <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-        <input type="text" id="museoTitulo" placeholder="Nombre del museo o lugar..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-
-        <div class="flex items-center gap-2">
-          <select id="museoAvatar" class="bg-white border border-slate-200 rounded-lg p-2 text-xs">
-            <option value="🏛️">🏛️ Museo</option>
-            <option value="🎨">🎨 Arte</option>
-            <option value="🌿">🌿 Parque / Jardín</option>
-            <option value="🏰">🏰 Histórico</option>
-            <option value="🔭">🔭 Ciencia</option>
-          </select>
-
-          <input type="date" id="museoFecha" class="bg-white border border-slate-200 rounded-lg p-2 text-xs flex-1">
-        </div>
-
-        <div class="flex items-center justify-between pt-1">
-          <label class="flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
-            <input type="checkbox" id="museoOmitirFecha" onchange="toggleMuseoFecha()" class="w-3.5 h-3.5 accent-indigo-600 rounded">
-            Sin fecha
+          <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+            <span class="text-xs font-medium text-slate-700">🛡️ Sensibilidad / RSD (Vulnerabilidad alta)</span>
+            <input type="checkbox" id="rsdCheck" onchange="guardarYActualizar()" class="w-4 h-4 accent-indigo-600 rounded">
           </label>
-          <button onclick="agregarMuseo()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all">
-            + Agregar
-          </button>
         </div>
-      </div>
+      </section>
 
-      <ul id="museosLista" class="divide-y divide-slate-100 text-xs space-y-1">
-        <li class="py-2 text-slate-400 italic">No han guardado museos aún.</li>
-      </ul>
-    </section>
+      <!-- Opciones de Acción para Él -->
+      <section class="bg-indigo-900 text-white p-5 rounded-2xl shadow-md space-y-3">
+        <h2 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Opciones de Acción para Él</h2>
+        <p id="accionMasculina" class="text-sm font-medium leading-relaxed">Esperando datos...</p>
+      </section>
 
-    <!-- Historial de Periodos -->
-    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Historial de Fechas Guardadas</h2>
-      <ul id="historialLista" class="divide-y divide-slate-100 text-xs text-slate-600">
-        <li class="py-2 text-slate-400 italic">No hay registros aún.</li>
-      </ul>
-    </section>
+      <!-- Historial de Periodos con opción de Editar / Borrar -->
+      <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Historial de Fechas (Editar / Borrar)</h2>
+        <ul id="historialLista" class="divide-y divide-slate-100 text-xs text-slate-600">
+          <li class="py-2 text-slate-400 italic">No hay registros aún.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ================= VISTA 2: PELÍCULAS ================= -->
+    <div id="vistaPeliculas" class="space-y-6 hidden">
+      <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🎬</span> Películas Vistas en Pareja
+        </h2>
+        
+        <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <input type="text" id="peliTitulo" list="sugerenciasPelis" placeholder="Título de la película..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <datalist id="sugerenciasPelis">
+            <option value="Orgullo y Prejuicio"></option>
+            <option value="El Viaje de Chihiro"></option>
+            <option value="Eterno Resplandor de una Mente sin Recuerdos"></option>
+            <option value="Interstellar"></option>
+            <option value="La La Land"></option>
+            <option value="About Time"></option>
+          </datalist>
+
+          <div class="flex items-center gap-2">
+            <select id="peliAvatar" class="bg-white border border-slate-200 rounded-lg p-2 text-xs">
+              <option value="🍿">🍿 Pochoclos</option>
+              <option value="🎥">🎥 Cine</option>
+              <option value="❤️">❤️ Romántica</option>
+              <option value="🌌">🌌 Sci-Fi</option>
+              <option value="👻">👻 Terror</option>
+              <option value="🧩">🧩 Animación</option>
+            </select>
+
+            <input type="date" id="peliFecha" class="bg-white border border-slate-200 rounded-lg p-2 text-xs flex-1">
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <label class="flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
+              <input type="checkbox" id="peliOmitirFecha" onchange="togglePeliFecha()" class="w-3.5 h-3.5 accent-indigo-600 rounded">
+              Omitir / No recuerdo fecha
+            </label>
+            <button onclick="agregarPelicula()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all">
+              + Agregar Película
+            </button>
+          </div>
+        </div>
+
+        <ul id="pelisLista" class="divide-y divide-slate-100 text-xs space-y-2">
+          <li class="py-2 text-slate-400 italic">No han guardado películas aún.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ================= VISTA 3: MUSEOS ================= -->
+    <div id="vistaMuseos" class="space-y-6 hidden">
+      <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🏛️</span> Museos y Paseos Vistos
+        </h2>
+        
+        <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <input type="text" id="museoTitulo" placeholder="Nombre del museo o lugar..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+
+          <div class="flex items-center gap-2">
+            <select id="museoAvatar" class="bg-white border border-slate-200 rounded-lg p-2 text-xs">
+              <option value="🏛️">🏛️ Museo</option>
+              <option value="🎨">🎨 Arte</option>
+              <option value="🌿">🌿 Parque / Jardín</option>
+              <option value="🏰">🏰 Histórico</option>
+              <option value="🔭">🔭 Ciencia</option>
+            </select>
+
+            <input type="date" id="museoFecha" class="bg-white border border-slate-200 rounded-lg p-2 text-xs flex-1">
+          </div>
+
+          <div class="flex items-center justify-between pt-1">
+            <label class="flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
+              <input type="checkbox" id="museoOmitirFecha" onchange="toggleMuseoFecha()" class="w-3.5 h-3.5 accent-indigo-600 rounded">
+              Sin fecha / Omitir
+            </label>
+            <button onclick="agregarMuseo()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all">
+              + Agregar Paseo
+            </button>
+          </div>
+        </div>
+
+        <ul id="museosLista" class="divide-y divide-slate-100 text-xs space-y-2">
+          <li class="py-2 text-slate-400 italic">No han guardado museos aún.</li>
+        </ul>
+      </section>
+    </div>
 
   </main>
 
@@ -328,7 +344,17 @@
 
     document.getElementById('fechaPeriodoInput').value = new Date().toISOString().split('T')[0];
 
-    // Escuchar cambios en Firebase Realtime Database
+    // Control de Pestañas (Tabs)
+    window.cambiarTab = function(tab) {
+      ['ciclo', 'peliculas', 'museos'].forEach(t => {
+        document.getElementById(`vista${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.add('hidden');
+        document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`).className = "py-2.5 rounded-xl hover:text-indigo-600 transition-all flex items-center justify-center gap-1";
+      });
+      document.getElementById(`vista${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
+      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).className = "py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center gap-1 font-bold";
+    };
+
+    // Sincronización Firebase
     onValue(estadoRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -339,7 +365,6 @@
       }
     });
 
-    // Guardado persistente de alternativas
     window.guardarYActualizar = function() {
       estadoActual.fatiga = document.getElementById('fatigaCheck').checked;
       estadoActual.rsd = document.getElementById('rsdCheck').checked;
@@ -351,6 +376,7 @@
       window.guardarYActualizar();
     };
 
+    // --- CICLO & HISTORIAL (Con Edición y Borrado) ---
     window.registrarPeriodoPersonalizado = function() {
       const fechaSel = document.getElementById('fechaPeriodoInput').value;
       if (!fechaSel) return;
@@ -359,23 +385,40 @@
       
       if (!estadoActual.historial.includes(fechaSel)) {
         estadoActual.historial.push(fechaSel);
-        estadoActual.historial.sort((a, b) => new Date(b.replace(/-/g, '/')) - new Date(a.replace(/-/g, '/')));
-
-        if (estadoActual.historial.length >= 2) {
-          let sumaDias = 0;
-          for (let i = 0; i < estadoActual.historial.length - 1; i++) {
-            const f1 = new Date(estadoActual.historial[i].replace(/-/g, '/'));
-            const f2 = new Date(estadoActual.historial[i + 1].replace(/-/g, '/'));
-            sumaDias += Math.abs(f1 - f2) / (1000 * 3600 * 24);
-          }
-          estadoActual.duracionPromedio = Math.round(sumaDias / (estadoActual.historial.length - 1));
-        }
-
-        window.guardarYActualizar();
+        recalcularHistorialYGuardar();
       }
     };
 
-    // Funciones de Películas
+    window.eliminarPeriodo = function(index) {
+      if (confirm("¿Estás seguro de eliminar esta fecha del historial?")) {
+        estadoActual.historial.splice(index, 1);
+        recalcularHistorialYGuardar();
+      }
+    };
+
+    window.editarPeriodo = function(index) {
+      const nuevaFecha = prompt("Modifica la fecha (Formato AAAA-MM-DD):", estadoActual.historial[index]);
+      if (nuevaFecha) {
+        estadoActual.historial[index] = nuevaFecha;
+        recalcularHistorialYGuardar();
+      }
+    };
+
+    function recalcularHistorialYGuardar() {
+      estadoActual.historial.sort((a, b) => new Date(b.replace(/-/g, '/')) - new Date(a.replace(/-/g, '/')));
+      if (estadoActual.historial.length >= 2) {
+        let sumaDias = 0;
+        for (let i = 0; i < estadoActual.historial.length - 1; i++) {
+          const f1 = new Date(estadoActual.historial[i].replace(/-/g, '/'));
+          const f2 = new Date(estadoActual.historial[i + 1].replace(/-/g, '/'));
+          sumaDias += Math.abs(f1 - f2) / (1000 * 3600 * 24);
+        }
+        estadoActual.duracionPromedio = Math.round(sumaDias / (estadoActual.historial.length - 1));
+      }
+      window.guardarYActualizar();
+    }
+
+    // --- PELÍCULAS ---
     window.togglePeliFecha = function() {
       const chk = document.getElementById('peliOmitirFecha').checked;
       document.getElementById('peliFecha').disabled = chk;
@@ -400,7 +443,23 @@
       window.guardarYActualizar();
     };
 
-    // Funciones de Museos
+    window.eliminarPelicula = function(index) {
+      estadoActual.peliculas.splice(index, 1);
+      window.guardarYActualizar();
+    };
+
+    window.editarPelicula = function(index) {
+      const p = estadoActual.peliculas[index];
+      const nuevoTitulo = prompt("Corregir título de la película:", p.titulo);
+      if (nuevoTitulo !== null) {
+        p.titulo = nuevoTitulo.trim() || p.titulo;
+        const nuevaFecha = prompt("Corregir fecha (o déjalo igual / escribe Sin fecha):", p.fecha);
+        if (nuevaFecha !== null) p.fecha = nuevaFecha.trim() || "Sin fecha";
+        window.guardarYActualizar();
+      }
+    };
+
+    // --- MUSEOS ---
     window.toggleMuseoFecha = function() {
       const chk = document.getElementById('museoOmitirFecha').checked;
       document.getElementById('museoFecha').disabled = chk;
@@ -425,6 +484,23 @@
       window.guardarYActualizar();
     };
 
+    window.eliminarMuseo = function(index) {
+      estadoActual.museos.splice(index, 1);
+      window.guardarYActualizar();
+    };
+
+    window.editarMuseo = function(index) {
+      const m = estadoActual.museos[index];
+      const nuevoTitulo = prompt("Corregir nombre del museo:", m.titulo);
+      if (nuevoTitulo !== null) {
+        m.titulo = nuevoTitulo.trim() || m.titulo;
+        const nuevaFecha = prompt("Corregir fecha (o déjalo igual / escribe Sin fecha):", m.fecha);
+        if (nuevaFecha !== null) m.fecha = nuevaFecha.trim() || "Sin fecha";
+        window.guardarYActualizar();
+      }
+    };
+
+    // --- RENDERIZAR VISTAS ---
     function renderApp(data) {
       document.getElementById('fatigaCheck').checked = !!data.fatiga;
       document.getElementById('rsdCheck').checked = !!data.rsd;
@@ -492,49 +568,73 @@
         document.getElementById('advertenciaEllaTexto').innerText = advElla;
       }
 
-      // Renderizar Películas
-      const pelisListaEl = document.getElementById('pelisLista');
-      const pelis = data.peliculas || [];
-      if (pelis.length > 0) {
-        pelisListaEl.innerHTML = pelis.map(p => `
-          <li class="py-2 flex items-center justify-between">
-            <span class="font-medium flex items-center gap-2"><span>${p.avatar}</span> ${p.titulo}</span>
-            <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-mono">${p.fecha}</span>
-          </li>
-        `).join('');
-      } else {
-        pelisListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado películas aún.</li>`;
-      }
-
-      // Renderizar Museos
-      const museosListaEl = document.getElementById('museosLista');
-      const museos = data.museos || [];
-      if (museos.length > 0) {
-        museosListaEl.innerHTML = museos.map(m => `
-          <li class="py-2 flex items-center justify-between">
-            <span class="font-medium flex items-center gap-2"><span>${m.avatar}</span> ${m.titulo}</span>
-            <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-mono">${m.fecha}</span>
-          </li>
-        `).join('');
-      } else {
-        museosListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado museos aún.</li>`;
-      }
-
-      // Renderizar Historial
+      // Render Historial con botones de Editar y Borrar
       const listaEl = document.getElementById('historialLista');
       if (historial.length > 0) {
         listaEl.innerHTML = historial.map((f, idx) => {
           const p = f.split('-');
           const d = new Date(p[0], p[1] - 1, p[2]);
           return `
-            <li class="py-2 flex justify-between items-center">
-              <span>Periodo #${historial.length - idx}</span>
-              <span class="font-semibold text-slate-700">${d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+            <li class="py-2 flex justify-between items-center border-b border-slate-100 last:border-0">
+              <div>
+                <span class="font-bold text-slate-700">Periodo #${historial.length - idx}</span>
+                <span class="block text-slate-500">${d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="editarPeriodo(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️ Editar</button>
+                <button onclick="eliminarPeriodo(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
+              </div>
             </li>
           `;
         }).join('');
       } else {
         listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay registros aún.</li>`;
+      }
+
+      // Render Películas con Editar y Borrar
+      const pelisListaEl = document.getElementById('pelisLista');
+      const pelis = data.peliculas || [];
+      if (pelis.length > 0) {
+        pelisListaEl.innerHTML = pelis.map((p, idx) => `
+          <li class="py-2.5 px-3 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="text-base">${p.avatar}</span>
+              <div>
+                <span class="font-bold text-slate-800 block text-xs">${p.titulo}</span>
+                <span class="text-[10px] text-slate-400">${p.fecha}</span>
+              </div>
+            </div>
+            <div class="flex gap-1.5">
+              <button onclick="editarPelicula(${idx})" class="bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️</button>
+              <button onclick="eliminarPelicula(${idx})" class="bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
+            </div>
+          </li>
+        `).join('');
+      } else {
+        pelisListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado películas aún.</li>`;
+      }
+
+      // Render Museos con Editar y Borrar
+      const museosListaEl = document.getElementById('museosLista');
+      const museos = data.museos || [];
+      if (museos.length > 0) {
+        museosListaEl.innerHTML = museos.map((m, idx) => `
+          <li class="py-2.5 px-3 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
+            <div class="flex items-center gap-2">
+              <span class="text-base">${m.avatar}</span>
+              <div>
+                <span class="font-bold text-slate-800 block text-xs">${m.titulo}</span>
+                <span class="text-[10px] text-slate-400">${m.fecha}</span>
+              </div>
+            </div>
+            <div class="flex gap-1.5">
+              <button onclick="editarMuseo(${idx})" class="bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️</button>
+              <button onclick="eliminarMuseo(${idx})" class="bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
+            </div>
+          </li>
+        `).join('');
+      } else {
+        museosListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado museos aún.</li>`;
       }
 
       // Acciones para Él
