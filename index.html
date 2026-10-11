@@ -23,38 +23,40 @@
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
-        appId: ONESIGNAL_APP_ID,
-        safari_web_id: "web.onesignal.auto.1713f7bb-2ce6-42f3-9221-24090e28478d",
-        notifyButton: {
-          enable: true,
-        },
+        appId: ONESIGNAL_APP_ID
       });
     });
 
-    // Función para activar / solicitar notificaciones en el teléfono
     window.activarNotificaciones = async function() {
+      if (!("Notification" in window)) {
+        alert("⚠️ Este navegador no soporta notificaciones Push.");
+        return;
+      }
+      if (Notification.permission === "denied") {
+        alert("🚫 Las notificaciones están bloqueadas en tu navegador.\n\nPor favor presiona el candado 🔒 al lado de la URL para cambiarlas a 'Permitir'.");
+        return;
+      }
       if (window.OneSignal) {
         try {
           const permiso = await OneSignal.Notifications.requestPermission();
           if (permiso) {
-            alert("✅ Notificaciones activadas con éxito en este dispositivo.");
+            alert("✅ ¡Notificaciones activadas con éxito!");
           } else {
             alert("⚠️ No se concedieron los permisos de notificación.");
           }
         } catch (e) {
           console.error(e);
-          alert("Asegúrate de estar abriendo la app desde Chrome/Safari directamente.");
+          alert("Error activando notificaciones: " + e.message);
         }
       } else {
-        alert("El SDK de notificaciones aún está cargando. Reintenta en 3 segundos.");
+        alert("El sistema de notificaciones está cargando, reintenta en un momento.");
       }
     };
 
-    // Prueba de notificación local dentro del navegador
     window.probarNotificacion = async function() {
       if (Notification.permission === "granted") {
         new Notification("💜 Alerta SincroPareja", {
-          body: "¡Prueba exitosa! Las notificaciones locales y el sistema Push están activos en este teléfono.",
+          body: "¡Prueba exitosa! Las notificaciones locales y el sistema Push están activos.",
           icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
         });
       } else {
@@ -63,10 +65,8 @@
       }
     };
   </script>
-
-
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12 select-none">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-16 select-none">
 
   <!-- Encabezado -->
   <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
@@ -83,14 +83,14 @@
     <!-- Sección Notificaciones -->
     <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2 text-center">
       <button onclick="activarNotificaciones()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
-        <span>🔔</span> 1. Activar Notificaciones Push en este Celular
+        <span>🔔</span> Activar Notificaciones Push
       </button>
       <button onclick="probarNotificacion()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
-        <span>📲</span> 2. Probar Notificación Local
+        <span>📲</span> Probar Notificación Local
       </button>
     </section>
 
-    <!-- Tarjeta: Registrar Inicio de Periodo con Fecha Flexible -->
+    <!-- Tarjeta: Registrar Inicio de Periodo -->
     <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
       <div>
         <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Registrar inicio de periodo</h2>
@@ -104,7 +104,7 @@
       </div>
     </section>
 
-    <!-- Gráfico Visual de Representación del Ciclo ("Aquí vamos") -->
+    <!-- Gráfico Visual de Representación del Ciclo -->
     <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
       <div class="flex justify-between items-start">
         <div>
@@ -125,15 +125,12 @@
           <span id="porcentajeTexto" class="text-indigo-600 font-extrabold">0%</span>
         </div>
         
-        <!-- Contenedor del Gráfico -->
         <div class="relative w-full h-7 bg-slate-100 rounded-xl overflow-hidden flex border border-slate-200/60 p-0.5">
-          <!-- Bloques de Fases Biológicas -->
           <div title="Menstrual" class="h-full bg-rose-200/80 rounded-l-lg" style="width: 18%;"></div>
           <div title="Folicular" class="h-full bg-emerald-200/80" style="width: 28%;"></div>
           <div title="Ovulatoria" class="h-full bg-sky-200/80" style="width: 11%;"></div>
           <div title="Lútea / SPM" class="h-full bg-amber-200/80 rounded-r-lg" style="width: 43%;"></div>
 
-          <!-- Indicador "Aquí Vamos" -->
           <div id="indicadorGrafico" class="absolute top-0 bottom-0 w-8 -ml-4 flex flex-col items-center justify-center transition-all duration-500" style="left: 0%;">
             <div class="bg-indigo-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md whitespace-nowrap animate-pulse">
               📍 Aquí vamos
@@ -155,6 +152,14 @@
           <span>🧠</span> Impacto Neurobiológico & TDAH
         </div>
         <p id="alertaTexto" class="text-xs leading-relaxed text-slate-600">Cargando...</p>
+      </div>
+
+      <!-- Advertencia & Autocuidado TDAH para Ella -->
+      <div id="advertenciaEllaBox" class="p-4 rounded-xl border border-rose-200 bg-rose-50 space-y-1.5">
+        <div class="flex items-center gap-2 font-bold text-xs text-rose-800">
+          <span>👑</span> Advertencia & Recomendaciones de Autocuidado para Ella
+        </div>
+        <p id="advertenciaEllaTexto" class="text-xs leading-relaxed text-rose-700 font-medium">Cargando recomendaciones...</p>
       </div>
     </section>
 
@@ -192,10 +197,93 @@
       </div>
     </section>
 
-    <!-- Opciones de Acción / Guía Directa para Él -->
+    <!-- Opciones de Acción para Él -->
     <section class="bg-indigo-900 text-white p-5 rounded-2xl shadow-md space-y-3">
       <h2 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Opciones de Acción para Él</h2>
       <p id="accionMasculina" class="text-sm font-medium leading-relaxed">Esperando datos...</p>
+    </section>
+
+    <!-- Ventana: Películas en Pareja -->
+    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <span>🎬</span> Películas Vistas en Pareja
+      </h2>
+      
+      <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+        <input type="text" id="peliTitulo" list="sugerenciasPelis" placeholder="Título de la película..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        <datalist id="sugerenciasPelis">
+          <option value="Orgullo y Prejuicio"></option>
+          <option value="El Viaje de Chihiro"></option>
+          <option value="Eterno Resplandor de una Mente sin Recuerdos"></option>
+          <option value="Interstellar"></option>
+          <option value="La La Land"></option>
+          <option value="About Time"></option>
+        </datalist>
+
+        <div class="flex items-center gap-2">
+          <select id="peliAvatar" class="bg-white border border-slate-200 rounded-lg p-2 text-xs">
+            <option value="🍿">🍿 Pochoclos</option>
+            <option value="🎥">🎥 Cine</option>
+            <option value="❤️">❤️ Romántica</option>
+            <option value="🌌">🌌 Sci-Fi</option>
+            <option value="👻">👻 Terror</option>
+            <option value="🧩">🧩 Animación</option>
+          </select>
+
+          <input type="date" id="peliFecha" class="bg-white border border-slate-200 rounded-lg p-2 text-xs flex-1">
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
+            <input type="checkbox" id="peliOmitirFecha" onchange="togglePeliFecha()" class="w-3.5 h-3.5 accent-indigo-600 rounded">
+            No recuerdo la fecha
+          </label>
+          <button onclick="agregarPelicula()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all">
+            + Agregar
+          </button>
+        </div>
+      </div>
+
+      <ul id="pelisLista" class="divide-y divide-slate-100 text-xs space-y-1">
+        <li class="py-2 text-slate-400 italic">No han guardado películas aún.</li>
+      </ul>
+    </section>
+
+    <!-- Ventana: Museos y Salidas Culturales -->
+    <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+      <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+        <span>🏛️</span> Museos y Paseos Vistos
+      </h2>
+      
+      <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+        <input type="text" id="museoTitulo" placeholder="Nombre del museo o lugar..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+
+        <div class="flex items-center gap-2">
+          <select id="museoAvatar" class="bg-white border border-slate-200 rounded-lg p-2 text-xs">
+            <option value="🏛️">🏛️ Museo</option>
+            <option value="🎨">🎨 Arte</option>
+            <option value="🌿">🌿 Parque / Jardín</option>
+            <option value="🏰">🏰 Histórico</option>
+            <option value="🔭">🔭 Ciencia</option>
+          </select>
+
+          <input type="date" id="museoFecha" class="bg-white border border-slate-200 rounded-lg p-2 text-xs flex-1">
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
+            <input type="checkbox" id="museoOmitirFecha" onchange="toggleMuseoFecha()" class="w-3.5 h-3.5 accent-indigo-600 rounded">
+            Sin fecha
+          </label>
+          <button onclick="agregarMuseo()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all">
+            + Agregar
+          </button>
+        </div>
+      </div>
+
+      <ul id="museosLista" class="divide-y divide-slate-100 text-xs space-y-1">
+        <li class="py-2 text-slate-400 italic">No han guardado museos aún.</li>
+      </ul>
     </section>
 
     <!-- Historial de Periodos -->
@@ -208,14 +296,8 @@
 
   </main>
 
-  <!-- Firebase SDK v9 & Lógica de la App -->
+  <!-- Firebase SDK v9 -->
   <script type="module">
-    // 1. Detectar si el usuario abrió la app desde el navegador interno de Instagram o Facebook
-    const isInAppBrowser = /Instagram|FBAN|FBAV/i.test(navigator.userAgent);
-    if (isInAppBrowser) {
-      alert("⚠️ Para instalar la app y activar las notificaciones, por favor toca los tres puntos superiores (...) y selecciona 'Abrir en Chrome' o 'Abrir en el navegador'.");
-    }
-
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -239,28 +321,34 @@
       duracionPromedio: 28,
       bateria: 'Media',
       fatiga: false,
-      rsd: false
+      rsd: false,
+      peliculas: [],
+      museos: []
     };
 
-    // Establecer fecha de hoy como predeterminada
     document.getElementById('fechaPeriodoInput').value = new Date().toISOString().split('T')[0];
 
     // Escuchar cambios en Firebase Realtime Database
     onValue(estadoRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        estadoActual = Object.assign({ historial: [], duracionPromedio: 28 }, data);
+        estadoActual = Object.assign({ historial: [], duracionPromedio: 28, peliculas: [], museos: [] }, data);
         renderApp(estadoActual);
         document.getElementById('syncStatus').innerText = "🟢 Sincronizado";
         document.getElementById('syncStatus').className = "text-xs bg-emerald-500 px-2.5 py-1 rounded-full font-medium shadow-sm";
       }
     });
 
-    // Funciones globales expuestas para los eventos inline HTML (onclick, onchange)
+    // Guardado persistente de alternativas
     window.guardarYActualizar = function() {
       estadoActual.fatiga = document.getElementById('fatigaCheck').checked;
       estadoActual.rsd = document.getElementById('rsdCheck').checked;
       set(estadoRef, estadoActual);
+    };
+
+    window.setBateria = function(nivel) {
+      estadoActual.bateria = nivel;
+      window.guardarYActualizar();
     };
 
     window.registrarPeriodoPersonalizado = function() {
@@ -271,10 +359,8 @@
       
       if (!estadoActual.historial.includes(fechaSel)) {
         estadoActual.historial.push(fechaSel);
-        // Ordenar fechas de más reciente a más antigua
         estadoActual.historial.sort((a, b) => new Date(b.replace(/-/g, '/')) - new Date(a.replace(/-/g, '/')));
 
-        // Recalcular promedio
         if (estadoActual.historial.length >= 2) {
           let sumaDias = 0;
           for (let i = 0; i < estadoActual.historial.length - 1; i++) {
@@ -289,8 +375,53 @@
       }
     };
 
-    window.setBateria = function(nivel) {
-      estadoActual.bateria = nivel;
+    // Funciones de Películas
+    window.togglePeliFecha = function() {
+      const chk = document.getElementById('peliOmitirFecha').checked;
+      document.getElementById('peliFecha').disabled = chk;
+      if (chk) document.getElementById('peliFecha').value = "";
+    };
+
+    window.agregarPelicula = function() {
+      const titulo = document.getElementById('peliTitulo').value.trim();
+      const avatar = document.getElementById('peliAvatar').value;
+      const fecha = document.getElementById('peliOmitirFecha').checked ? "Sin fecha" : document.getElementById('peliFecha').value;
+
+      if (!titulo) return alert("Por favor escribe el título de la película.");
+
+      if (!estadoActual.peliculas) estadoActual.peliculas = [];
+      estadoActual.peliculas.unshift({ titulo, avatar, fecha: fecha || "Sin fecha" });
+
+      document.getElementById('peliTitulo').value = "";
+      document.getElementById('peliFecha').value = "";
+      document.getElementById('peliOmitirFecha').checked = false;
+      document.getElementById('peliFecha').disabled = false;
+
+      window.guardarYActualizar();
+    };
+
+    // Funciones de Museos
+    window.toggleMuseoFecha = function() {
+      const chk = document.getElementById('museoOmitirFecha').checked;
+      document.getElementById('museoFecha').disabled = chk;
+      if (chk) document.getElementById('museoFecha').value = "";
+    };
+
+    window.agregarMuseo = function() {
+      const titulo = document.getElementById('museoTitulo').value.trim();
+      const avatar = document.getElementById('museoAvatar').value;
+      const fecha = document.getElementById('museoOmitirFecha').checked ? "Sin fecha" : document.getElementById('museoFecha').value;
+
+      if (!titulo) return alert("Por favor escribe el nombre del museo o lugar.");
+
+      if (!estadoActual.museos) estadoActual.museos = [];
+      estadoActual.museos.unshift({ titulo, avatar, fecha: fecha || "Sin fecha" });
+
+      document.getElementById('museoTitulo').value = "";
+      document.getElementById('museoFecha').value = "";
+      document.getElementById('museoOmitirFecha').checked = false;
+      document.getElementById('museoFecha').disabled = false;
+
       window.guardarYActualizar();
     };
 
@@ -298,7 +429,6 @@
       document.getElementById('fatigaCheck').checked = !!data.fatiga;
       document.getElementById('rsdCheck').checked = !!data.rsd;
 
-      // Botones batería
       ['Baja', 'Media', 'Alta'].forEach(b => {
         const btn = document.getElementById(`btnBat${b}`);
         if (data.bateria === b) {
@@ -313,7 +443,6 @@
       document.getElementById('promedioText').innerText = `(Promedio: ${duracion} días)`;
 
       if (historial.length > 0) {
-        // Corrección de parsing de fechas para compatibilidad cross-browser
         const partesFecha = historial[0].split('-');
         const ultimaFUM = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
         
@@ -329,35 +458,66 @@
         document.getElementById('diaCicloText').innerText = `Día ${diaCiclo}`;
         document.getElementById('proxPeriodoText').innerText = prox.toLocaleDateString('es-ES');
 
-        // Porcentaje y posición en gráfico
         let porcentaje = Math.min(Math.max(Math.round((diaCiclo / duracion) * 100), 2), 98);
         document.getElementById('porcentajeTexto').innerText = `${porcentaje}%`;
         document.getElementById('indicadorGrafico').style.left = `${porcentaje}%`;
 
-        // Fases y relación TDAH
-        let fase = "", color = "", tit = "", txt = "";
+        let fase = "", color = "", tit = "", txt = "", advElla = "";
         if (diaCiclo <= 5) {
           fase = "1. Menstrual"; color = "bg-rose-100 text-rose-700";
           tit = "🩸 Caída de Estrógenos y Dopamina"; 
           txt = "Baja disponibilidad ejecutiva. El cansancio físico acentúa la neblina mental y la procrastinación en el TDAH.";
+          advElla = "💆‍♀️ Cuidado con exigir la misma productividad de siempre. Cancela compromisos secundarios, no tomes decisiones importantes hoy y prioriza el descanso sin culpa.";
         } else if (diaCiclo <= 13) {
           fase = "2. Folicular"; color = "bg-emerald-100 text-emerald-700";
           tit = "🌱 Aumento de Dopamina"; 
           txt = "Pico de claridad mental y energía. Mejor momento del mes para organizar, iniciar proyectos o conversar temas complejos.";
+          advElla = "🚀 Aprovecha esta ventana de dopamina alta para avanzar tareas pendientes o planificar, pero cuida no hiperfocarte al punto de agotar tus reservas.";
         } else if (diaCiclo <= (duracion - 12)) {
           fase = "3. Ovulatoria"; color = "bg-sky-100 text-sky-700";
           tit = "✨ Cúspide Hormonal"; 
           txt = "Alta sociabilidad y energía física. El cerebro responde rápido a los estímulos.";
+          advElla = "✨ Tienes alta energía social. Disfruta salidas o proyectos, pero recuerda hidratarte y cuidar tus límites de descanso.";
         } else {
           fase = "4. Lútea / SPM"; color = "bg-amber-100 text-amber-800";
           tit = "⚠️ Caída Libre de Dopamina (Sensibilidad TDAH)"; 
-          txt = "La progesterona disminuye la efectividad de la dopamina. Aumenta la sobrecarga sensorial, la fatiga de decisión y el riesgo de RSD (disforia sensible al rechazo).";
+          txt = "La progesterona disminuye la efectividad de la dopamina. Aumenta la sobrecarga sensorial, la fatiga de decisión y el riesgo de RSD.";
+          advElla = "⚠️ Alerta de Vulnerabilidad: Es común sentir que las cosas pesan más o percibir rechazo (RSD). Evita discusiones impulsivas, reduce los estímulos ruidosos y apóyate en tu pareja.";
         }
 
         document.getElementById('faseBadge').innerText = fase;
         document.getElementById('faseBadge').className = `text-xs font-bold px-3 py-1 rounded-full ${color}`;
         document.getElementById('alertaTitulo').innerHTML = `<span>🧠</span> ${tit}`;
         document.getElementById('alertaTexto').innerText = txt;
+        document.getElementById('advertenciaEllaTexto').innerText = advElla;
+      }
+
+      // Renderizar Películas
+      const pelisListaEl = document.getElementById('pelisLista');
+      const pelis = data.peliculas || [];
+      if (pelis.length > 0) {
+        pelisListaEl.innerHTML = pelis.map(p => `
+          <li class="py-2 flex items-center justify-between">
+            <span class="font-medium flex items-center gap-2"><span>${p.avatar}</span> ${p.titulo}</span>
+            <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-mono">${p.fecha}</span>
+          </li>
+        `).join('');
+      } else {
+        pelisListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado películas aún.</li>`;
+      }
+
+      // Renderizar Museos
+      const museosListaEl = document.getElementById('museosLista');
+      const museos = data.museos || [];
+      if (museos.length > 0) {
+        museosListaEl.innerHTML = museos.map(m => `
+          <li class="py-2 flex items-center justify-between">
+            <span class="font-medium flex items-center gap-2"><span>${m.avatar}</span> ${m.titulo}</span>
+            <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-mono">${m.fecha}</span>
+          </li>
+        `).join('');
+      } else {
+        museosListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado museos aún.</li>`;
       }
 
       // Renderizar Historial
@@ -377,7 +537,7 @@
         listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay registros aún.</li>`;
       }
 
-      // Opciones de acción para él
+      // Acciones para Él
       let accion = "🟢 Estado Fluido: Momento ideal para coordinar actividades o compartir tiempo de calidad.";
       if (data.rsd && data.fatiga) {
         accion = "🛡️ OPCIÓN RECOMENDADA: Cobertura total. No hagas preguntas de opción múltiple, gestiona la cena/hogar directamente y valida sus emociones sin juzgar.";
@@ -391,6 +551,5 @@
       document.getElementById('accionMasculina').innerText = accion;
     }
   </script>
-  
 </body>
 </html>
