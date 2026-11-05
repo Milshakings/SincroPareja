@@ -32,15 +32,20 @@
         alert("⚠️ Este navegador no soporta notificaciones.");
         return;
       }
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        alert("✅ ¡Notificaciones activadas con éxito en este dispositivo!");
-        new Notification("💜 SincroPareja", {
-          body: "¡Las notificaciones están funcionando perfectamente aquí!",
-          icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
-        });
-      } else {
-        alert("🚫 Los permisos de notificación fueron denegados o bloqueados en el navegador.");
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          alert("✅ ¡Notificaciones activadas con éxito en este dispositivo!");
+          new Notification("💜 SincroPareja", {
+            body: "¡Las notificaciones están funcionando perfectamente aquí!",
+            icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
+          });
+        } else {
+          alert("🚫 Los permisos de notificación fueron denegados o bloqueados en el navegador.");
+        }
+      } catch (e) {
+        console.error(e);
+        alert("Asegúrate de estar abriendo la app desde Chrome o Safari directamente.");
       }
     };
 
@@ -312,7 +317,7 @@
         
         <!-- Input para nueva nota/mensaje con nombre libre -->
         <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-          <input type="text" id="notaAutor" placeholder="Tu nombre o apodo (ej. Raúl, Lily)..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
+          <input type="text" id="notaAutor" placeholder="Tu nombre o apodo..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
           <textarea id="notaTexto" rows="2" placeholder="Escribe una nota importante o mensaje..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"></textarea>
           
           <div class="flex justify-end">
@@ -364,82 +369,210 @@
 
     document.getElementById('fechaPeriodoInput').value = new Date().toISOString().split('T')[0];
 
-    // Control de Pestañas (Tabs)
+    // Control de Pestañas (Tabs) EXUESTO GLOBALMENTE
     window.cambiarTab = function(tab) {
       ['ciclo', 'peliculas', 'museos', 'chat'].forEach(t => {
-        document.getElementById(`vista${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.add('hidden');
-        document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`).className = "py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5"; }); document.getElementById(`vista${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
-      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).className = "py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex flex-col items-center justify-center gap-0.5 font-bold"; };  // Sincronización Firebase onValue(estadoRef, (snapshot) => { const data = snapshot.val(); if (data) { estadoActual = Object.assign({ historial: [], duracionPromedio: 28, peliculas: [], museos: [], notas: [] }, data); renderApp(estadoActual); document.getElementById('syncStatus').innerText = "🟢 Sincronizado"; document.getElementById('syncStatus').className = "text-xs bg-emerald-500 px-2.5 py-1 rounded-full font-medium shadow-sm"; } });  window.guardarYActualizar = function() { estadoActual.fatiga = document.getElementById('fatigaCheck').checked; estadoActual.rsd = document.getElementById('rsdCheck').checked; set(estadoRef, estadoActual); };  window.setBateria = function(nivel) { estadoActual.bateria = nivel; window.guardarYActualizar(); };  // --- CICLO & HISTORIAL --- window.registrarPeriodoPersonalizado = function() { const fechaSel = document.getElementById('fechaPeriodoInput').value; if (!fechaSel) return; if (!estadoActual.historial) estadoActual.historial = []; if (!estadoActual.historial.includes(fechaSel)) { estadoActual.historial.push(fechaSel); recalcularHistorialYGuardar(); } };  window.eliminarPeriodo = function(index) { if (confirm("¿Estás seguro de eliminar esta fecha del historial?")) { estadoActual.historial.splice(index, 1); recalcularHistorialYGuardar(); } };  window.editarPeriodo = function(index) { const nuevaFecha = prompt("Modifica la fecha (Formato AAAA-MM-DD):", estadoActual.historial[index]); if (nuevaFecha) { estadoActual.historial[index] = nuevaFecha; recalcularHistorialYGuardar(); } };  function recalcularHistorialYGuardar() { estadoActual.historial.sort((a, b) => new Date(b.replace(/-/g, '/')) - new Date(a.replace(/-/g, '/'))); if (estadoActual.historial.length >= 2) { let sumaDias = 0; for (let i = 0; i < estadoActual.historial.length - 1; i++) { const f1 = new Date(estadoActual.historial[i].replace(/-/g, '/')); const f2 = new Date(estadoActual.historial[i + 1].replace(/-/g, '/')); sumaDias += Math.abs(f1 - f2) / (1000 * 3600 * 24); } estadoActual.duracionPromedio = Math.round(sumaDias / (estadoActual.historial.length - 1)); } window.guardarYActualizar(); }  // --- PELÍCULAS --- window.togglePeliFecha = function() { const chk = document.getElementById('peliOmitirFecha').checked; document.getElementById('peliFecha').disabled = chk; if (chk) document.getElementById('peliFecha').value = ""; };  window.agregarPelicula = function() { const titulo = document.getElementById('peliTitulo').value.trim(); const avatar = document.getElementById('peliAvatar').value; const fecha = document.getElementById('peliOmitirFecha').checked ? "Sin fecha" : document.getElementById('peliFecha').value; if (!titulo) return alert("Por favor escribe el título de la película."); if (!estadoActual.peliculas) estadoActual.peliculas = []; estadoActual.peliculas.unshift({ titulo, avatar, fecha: fecha \vert{}\vert{} "Sin fecha" }); document.getElementById('peliTitulo').value = ""; document.getElementById('peliFecha').value = ""; document.getElementById('peliOmitirFecha').checked = false; document.getElementById('peliFecha').disabled = false; window.guardarYActualizar(); };  window.eliminarPelicula = function(index) { estadoActual.peliculas.splice(index, 1); window.guardarYActualizar(); };  window.editarPelicula = function(index) { const p = estadoActual.peliculas[index]; const nuevoTitulo = prompt("Corregir título de la película:", p.titulo); if (nuevoTitulo !== null) { p.titulo = nuevoTitulo.trim() \vert{}\vert{} p.titulo; const nuevaFecha = prompt("Corregir fecha:", p.fecha); if (nuevaFecha !== null) p.fecha = nuevaFecha.trim() \vert{}\vert{} "Sin fecha"; window.guardarYActualizar(); } };  // --- MUSEOS --- window.toggleMuseoFecha = function() { const chk = document.getElementById('museoOmitirFecha').checked; document.getElementById('museoFecha').disabled = chk; if (chk) document.getElementById('museoFecha').value = ""; };  window.agregarMuseo = function() { const titulo = document.getElementById('museoTitulo').value.trim(); const avatar = document.getElementById('museoAvatar').value; const fecha = document.getElementById('museoOmitirFecha').checked ? "Sin fecha" : document.getElementById('museoFecha').value; if (!titulo) return alert("Por favor escribe el nombre del museo o lugar."); if (!estadoActual.museos) estadoActual.museos = []; estadoActual.museos.unshift({ titulo, avatar, fecha: fecha \vert{}\vert{} "Sin fecha" }); document.getElementById('museoTitulo').value = ""; document.getElementById('museoFecha').value = ""; document.getElementById('museoOmitirFecha').checked = false; document.getElementById('museoFecha').disabled = false; window.guardarYActualizar(); };  window.eliminarMuseo = function(index) { estadoActual.museos.splice(index, 1); window.guardarYActualizar(); };  window.editarMuseo = function(index) { const m = estadoActual.museos[index]; const nuevoTitulo = prompt("Corregir nombre del museo:", m.titulo); if (nuevoTitulo !== null) { m.titulo = nuevoTitulo.trim() \vert{}\vert{} m.titulo; const nuevaFecha = prompt("Corregir fecha:", m.fecha); if (nuevaFecha !== null) m.fecha = nuevaFecha.trim() \vert{}\vert{} "Sin fecha"; window.guardarYActualizar(); } };  // --- NOTAS & CHAT PRIVADO --- window.agregarNota = function() { const autor = document.getElementById('notaAutor').value.trim(); const texto = document.getElementById('notaTexto').value.trim();  if (!autor) return alert("Por favor escribe tu nombre."); if (!texto) return alert("Escribe el contenido de la nota.");  const fechaHora = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }); if (!estadoActual.notas) estadoActual.notas = []; estadoActual.notas.unshift({ texto, autor, fecha: fechaHora });  document.getElementById('notaTexto').value = ""; window.guardarYActualizar(); };  window.eliminarNota = function(index) { if (confirm("¿Eliminar esta nota?")) { estadoActual.notas.splice(index, 1); window.guardarYActualizar(); } };  // --- RENDERIZAR VISTAS --- function renderApp(data) { document.getElementById('fatigaCheck').checked = !!data.fatiga; document.getElementById('rsdCheck').checked = !!data.rsd;  ['Baja', 'Media', 'Alta'].forEach(b => { const btn = document.getElementById(`btnBat${b}`);
-        if (data.bateria === b) {
-          btn.className = "bat-btn border p-2.5 rounded-xl text-center bg-indigo-50 border-indigo-500 font-semibold shadow-sm";
-        } else {
-          btn.className = "bat-btn border border-slate-200 p-2.5 rounded-xl text-center hover:bg-slate-50";
+        const elVista = document.getElementById(`vista${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        const elTab = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        if(elVista) elVista.classList.add('hidden');
+        if(elTab) elTab.className = "py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5";
+      });
+      const vistaActiva = document.getElementById(`vista${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+      const tabActivo = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+      if(vistaActiva) vistaActiva.classList.remove('hidden');
+      if(tabActivo) tabActivo.className = "py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex flex-col items-center justify-center gap-0.5 font-bold";
+    };
+
+    // Sincronización Firebase
+    onValue(estadoRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        estadoActual = Object.assign({ historial: [], duracionPromedio: 28, peliculas: [], museos: [], notas: [] }, data);
+        renderApp(estadoActual);
+        const syncEl = document.getElementById('syncStatus');
+        if(syncEl) {
+          syncEl.innerText = "🟢 Sincronizado";
+          syncEl.className = "text-xs bg-emerald-500 px-2.5 py-1 rounded-full font-medium shadow-sm";
+        }
+      }
+    });
+
+    window.guardarYActualizar = function() {
+      const fatigaEl = document.getElementById('fatigaCheck');
+      const rsdEl = document.getElementById('rsdCheck');
+      if(fatigaEl) estadoActual.fatiga = fatigaEl.checked;
+      if(rsdEl) estadoActual.rsd = rsdEl.checked;
+      set(estadoRef, estadoActual);
+    };
+
+    window.setBateria = function(nivel) {
+      estadoActual.bateria = nivel;
+      window.guardarYActualizar();
+    };
+
+    // --- CICLO & HISTORIAL ---
+    window.registrarPeriodoPersonalizado = function() {
+      const fechaSel = document.getElementById('fechaPeriodoInput').value;
+      if (!fechaSel) return;
+      if (!estadoActual.historial) estadoActual.historial = [];
+      if (!estadoActual.historial.includes(fechaSel)) {
+        estadoActual.historial.push(fechaSel);
+        recalcularHistorialYGuardar();
+      }
+    };
+
+    window.eliminarPeriodo = function(index) {
+      if (confirm("¿Estás seguro de eliminar esta fecha del historial?")) {
+        estadoActual.historial.splice(index, 1);
+        recalcularHistorialYGuardar();
+      }
+    };
+
+    window.editarPeriodo = function(index) {
+      const nuevaFecha = prompt("Modifica la fecha (Formato AAAA-MM-DD):", estadoActual.historial[index]);
+      if (nuevaFecha) {
+        estadoActual.historial[index] = nuevaFecha;
+        recalcularHistorialYGuardar();
+      }
+    };
+
+    function recalcularHistorialYGuardar() {
+      estadoActual.historial.sort((a, b) => new Date(b.replace(/-/g, '/')) - new Date(a.replace(/-/g, '/')));
+      if (estadoActual.historial.length >= 2) {
+        let sumaDias = 0;
+        for (let i = 0; i < estadoActual.historial.length - 1; i++) {
+          const f1 = new Date(estadoActual.historial[i].replace(/-/g, '/'));
+          const f2 = new Date(estadoActual.historial[i + 1].replace(/-/g, '/'));
+          sumaDias += Math.abs(f1 - f2) / (1000 * 3600 * 24);
+        }
+        estadoActual.duracionPromedio = Math.round(sumaDias / (estadoActual.historial.length - 1));
+      }
+      window.guardarYActualizar();
+    }
+
+    // --- PELÍCULAS ---
+    window.togglePeliFecha = function() {
+      const chk = document.getElementById('peliOmitirFecha').checked;
+      document.getElementById('peliFecha').disabled = chk;
+      if (chk) document.getElementById('peliFecha').value = "";
+    };
+
+    window.agregarPelicula = function() {
+      const titulo = document.getElementById('peliTitulo').value.trim();
+      const avatar = document.getElementById('peliAvatar').value;
+      const fecha = document.getElementById('peliOmitirFecha').checked ? "Sin fecha" : document.getElementById('peliFecha').value;
+      if (!titulo) return alert("Por favor escribe el título de la película.");
+      if (!estadoActual.peliculas) estadoActual.peliculas = [];
+      estadoActual.peliculas.unshift({ titulo, avatar, fecha: fecha || "Sin fecha" });
+      document.getElementById('peliTitulo').value = "";
+      document.getElementById('peliFecha').value = "";
+      document.getElementById('peliOmitirFecha').checked = false;
+      document.getElementById('peliFecha').disabled = false;
+      window.guardarYActualizar();
+    };
+
+    window.eliminarPelicula = function(index) {
+      estadoActual.peliculas.splice(index, 1);
+      window.guardarYActualizar();
+    };
+
+    window.editarPelicula = function(index) {
+      const p = estadoActual.peliculas[index];
+      const nuevoTitulo = prompt("Corregir título de la película:", p.titulo);
+      if (nuevoTitulo !== null) {
+        p.titulo = nuevoTitulo.trim() || p.titulo;
+        const nuevaFecha = prompt("Corregir fecha:", p.fecha);
+        if (nuevaFecha !== null) p.fecha = nuevaFecha.trim() || "Sin fecha";
+        window.guardarYActualizar();
+      }
+    };
+
+    // --- MUSEOS ---
+    window.toggleMuseoFecha = function() {
+      const chk = document.getElementById('museoOmitirFecha').checked;
+      document.getElementById('museoFecha').disabled = chk;
+      if (chk) document.getElementById('museoFecha').value = "";
+    };
+
+    window.agregarMuseo = function() {
+      const titulo = document.getElementById('museoTitulo').value.trim();
+      const avatar = document.getElementById('museoAvatar').value;
+      const fecha = document.getElementById('museoOmitirFecha').checked ? "Sin fecha" : document.getElementById('museoFecha').value;
+      if (!titulo) return alert("Por favor escribe el nombre del museo o lugar.");
+      if (!estadoActual.museos) estadoActual.museos = [];
+      estadoActual.museos.unshift({ titulo, avatar, fecha: fecha || "Sin fecha" });
+      document.getElementById('museoTitulo').value = "";
+      document.getElementById('museoFecha').value = "";
+      document.getElementById('museoOmitirFecha').checked = false;
+      document.getElementById('museoFecha').disabled = false;
+      window.guardarYActualizar();
+    };
+
+    window.eliminarMuseo = function(index) {
+      estadoActual.museos.splice(index, 1);
+      window.guardarYActualizar();
+    };
+
+    window.editarMuseo = function(index) {
+      const m = estadoActual.museos[index];
+      const nuevoTitulo = prompt("Corregir nombre del museo:", m.titulo);
+      if (nuevoTitulo !== null) {
+        m.titulo = nuevoTitulo.trim() || m.titulo;
+        const nuevaFecha = prompt("Corregir fecha:", m.fecha);
+        if (nuevaFecha !== null) m.fecha = nuevaFecha.trim() || "Sin fecha";
+        window.guardarYActualizar();
+      }
+    };
+
+    // --- NOTAS & CHAT PRIVADO ---
+    window.agregarNota = function() {
+      const autor = document.getElementById('notaAutor').value.trim();
+      const texto = document.getElementById('notaTexto').value.trim();
+      
+      if (!autor) return alert("Por favor escribe tu nombre.");
+      if (!texto) return alert("Escribe el contenido de la nota.");
+      
+      const fechaHora = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+      if (!estadoActual.notas) estadoActual.notas = [];
+      estadoActual.notas.unshift({ texto, autor, fecha: fechaHora });
+
+      document.getElementById('notaTexto').value = "";
+      window.guardarYActualizar();
+    };
+
+    window.eliminarNota = function(index) {
+      if (confirm("¿Eliminar esta nota?")) {
+        estadoActual.notas.splice(index, 1);
+        window.guardarYActualizar();
+      }
+    };
+
+    // --- RENDERIZAR VISTAS ---
+    function renderApp(data) {
+      const fatigaEl = document.getElementById('fatigaCheck');
+      const rsdEl = document.getElementById('rsdCheck');
+      if(fatigaEl) fatigaEl.checked = !!data.fatiga;
+      if(rsdEl) rsdEl.checked = !!data.rsd;
+
+      ['Baja', 'Media', 'Alta'].forEach(b => {
+        const btn = document.getElementById(`btnBat${b}`);
+        if(btn) {
+          if (data.bateria === b) {
+            btn.className = "bat-btn border p-2.5 rounded-xl text-center bg-indigo-50 border-indigo-500 font-semibold shadow-sm";
+          } else {
+            btn.className = "bat-btn border border-slate-200 p-2.5 rounded-xl text-center hover:bg-slate-50";
+          }
         }
       });
 
       const historial = data.historial || [];
       const duracion = data.duracionPromedio || 28;
-      document.getElementById('promedioText').innerText = `(Promedio: ${duracion} días)`;  if (historial.length > 0) { const partesFecha = historial[0].split('-'); const ultimaFUM = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);  const hoy = new Date(); hoy.setHours(0,0,0,0);  const difTiempo = hoy - ultimaFUM; const diaCiclo = Math.max(1, Math.floor(difTiempo / (1000 * 3600 * 24)) + 1);  const prox = new Date(ultimaFUM); prox.setDate(prox.getDate() + duracion);  document.getElementById('diaCicloText').innerText = `Día ${diaCiclo}`;
-        document.getElementById('proxPeriodoText').innerText = prox.toLocaleDateString('es-ES');
+      const promEl = document.getElementById('promedioText');
+      if(promEl) promEl.innerText = `(Promedio: ${duracion} días)`;
 
-        let porcentaje = Math.min(Math.max(Math.round((diaCiclo / duracion) * 100), 2), 98);
-        document.getElementById('porcentajeTexto').innerText = `${porcentaje}\%`; document.getElementById('indicadorGrafico').style.left = `${porcentaje}%`;
-
-        let fase = "", color = "", tit = "", txt = "", advElla = "";
-        if (diaCiclo <= 5) {
-          fase = "1. Menstrual"; color = "bg-rose-100 text-rose-700";
-          tit = "🩸 Caída de Estrógenos y Dopamina"; 
-          txt = "Baja disponibilidad ejecutiva. El cansancio físico acentúa la neblina mental y la procrastinación en el TDAH.";
-          advElla = "💆‍♀️ Cuidado con exigir la misma productividad de siempre. Cancela compromisos secundarios, no tomes decisiones importantes hoy y prioriza el descanso sin culpa.";
-        } else if (diaCiclo <= 13) {
-          fase = "2. Folicular"; color = "bg-emerald-100 text-emerald-700";
-          tit = "🌱 Aumento de Dopamina"; 
-          txt = "Pico de claridad mental y energía. Mejor momento del mes para organizar, iniciar proyectos o conversar temas complejos.";
-          advElla = "🚀 Aprovecha esta ventana de dopamina alta para avanzar tareas pendientes o planificar, pero cuida no hiperfocarte al punto de agotar tus reservas.";
-        } else if (diaCiclo <= (duracion - 12)) {
-          fase = "3. Ovulatoria"; color = "bg-sky-100 text-sky-700";
-          tit = "✨ Cúspide Hormonal"; 
-          txt = "Alta sociabilidad y energía física. El cerebro responde rápido a los estímulos.";
-          advElla = "✨ Tienes alta energía social. Disfruta salidas o proyectos, pero recuerda hidratarte y cuidar tus límites de descanso.";
-        } else {
-          fase = "4. Lútea / SPM"; color = "bg-amber-100 text-amber-800";
-          tit = "⚠️ Caída Libre de Dopamina (Sensibilidad TDAH)"; 
-          txt = "La progesterona disminuye la efectividad de la dopamina. Aumenta la sobrecarga sensorial, la fatiga de decisión y el riesgo de RSD.";
-          advElla = "⚠️ Alerta de Vulnerabilidad: Es común sentir que las cosas pesan más o percibir rechazo (RSD). Evita discusiones impulsivas, reduce los estímulos ruidosos y apóyate en tu pareja.";
-        }
-
-        document.getElementById('faseBadge').innerText = fase;
-        document.getElementById('faseBadge').className = `text-xs font-bold px-3 py-1 rounded-full ${color}`; document.getElementById('alertaTitulo').innerHTML = `<span>🧠</span> ${tit}`;
-        document.getElementById('alertaTexto').innerText = txt;
-        document.getElementById('advertenciaEllaTexto').innerText = advElla;
-      }
-
-      // Render Historial
-      const listaEl = document.getElementById('historialLista');
       if (historial.length > 0) {
-        listaEl.innerHTML = historial.map((f, idx) => {
-          const p = f.split('-');
-          const d = new Date(p[0], p[1] - 1, p[2]);
-          return `
-            <li class="py-2 flex justify-between items-center border-b border-slate-100 last:border-0">
-              <div>
-                <span class="font-bold text-slate-700">Periodo #${historial.length - idx}</span>
-                <span class="block text-slate-500">${d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-              </div>
-              <div class="flex gap-1.5">
-                <button onclick="editarPeriodo(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️ Editar</button>
-                <button onclick="eliminarPeriodo(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
-              </div>
-            </li>
-          `;
-        }).join('');
-      } else {
-        listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay registros aún.</li>`;
-      }
-
-      // Render Películas
-      const pelisListaEl = document.getElementById('pelisLista');
-      const pelis = data.peliculas || [];
-      if (pelis.length > 0) {
-        pelisListaEl.innerHTML = pelis.map((p, idx) => `
-          <li class="py-2.5 px-3 bg-slate-50 rounded-
+        const partesFecha = historial[0].split('-');
+        const ultimaFUM = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
+        
+        const hoy = new Date();
+        hoy.setHours(0,0,0,0);
