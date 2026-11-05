@@ -41,11 +41,11 @@
             icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
           });
         } else {
-          alert("🚫 Los permisos de notificación fueron denegados o bloqueados en el navegador.");
+          alert("🚫 Los permisos de notificación fueron denegados o bloqueados.");
         }
       } catch (e) {
         console.error(e);
-        alert("Asegúrate de estar abriendo la app desde Chrome o Safari directamente.");
+        alert("Asegúrate de abrir la app desde Chrome o Safari directamente.");
       }
     };
 
@@ -76,16 +76,16 @@
   <!-- Navegación por Pestañas (Tabs) -->
   <nav class="max-w-md mx-auto px-4 pt-3 pb-1">
     <div class="grid grid-cols-4 gap-1 bg-slate-200/80 p-1 rounded-2xl shadow-inner text-[11px] font-bold text-slate-600">
-      <button onclick="cambiarTab('ciclo')" id="tabCiclo" class="py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex flex-col items-center justify-center gap-0.5">
+      <button onclick="window.cambiarTab('ciclo')" id="tabCiclo" class="py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex flex-col items-center justify-center gap-0.5">
         <span>🩸</span> Ciclo
       </button>
-      <button onclick="cambiarTab('peliculas')" id="tabPeliculas" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
+      <button onclick="window.cambiarTab('peliculas')" id="tabPeliculas" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
         <span>🎬</span> Películas
       </button>
-      <button onclick="cambiarTab('museos')" id="tabMuseos" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
+      <button onclick="window.cambiarTab('museos')" id="tabMuseos" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
         <span>🏛️</span> Museos
       </button>
-      <button onclick="cambiarTab('chat')" id="tabChat" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
+      <button onclick="window.cambiarTab('chat')" id="tabChat" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
         <span>💬</span> Notas
       </button>
     </div>
@@ -95,8 +95,6 @@
 
     <!-- ================= VISTA 1: CICLO & TDAH ================= -->
     <div id="vistaCiclo" class="space-y-6">
-
-      <!-- Sección Notificaciones -->
       <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2 text-center">
         <button onclick="activarNotificaciones()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
           <span>🔔</span> Activar Permisos de Notificación
@@ -106,7 +104,6 @@
         </button>
       </section>
 
-      <!-- Tarjeta: Registrar Inicio de Periodo -->
       <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
         <div>
           <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Registrar inicio de periodo</h2>
@@ -120,7 +117,6 @@
         </div>
       </section>
 
-      <!-- Gráfico Visual de Representación del Ciclo -->
       <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
         <div class="flex justify-between items-start">
           <div>
@@ -169,10 +165,8 @@
         </div>
       </section>
 
-      <!-- Check-in Diario (Ella) -->
       <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
         <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Check-in Diario (Ella)</h2>
-        
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-2">Batería Social y Sensorial</label>
           <div class="grid grid-cols-3 gap-2">
@@ -203,13 +197,11 @@
         </div>
       </section>
 
-      <!-- Opciones de Acción para Él -->
       <section class="bg-indigo-900 text-white p-5 rounded-2xl shadow-md space-y-3">
         <h2 class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Opciones de Acción para Él</h2>
         <p id="accionMasculina" class="text-sm font-medium leading-relaxed">Esperando datos...</p>
       </section>
 
-      <!-- Historial de Periodos -->
       <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
         <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Historial de Fechas (Editar / Borrar)</h2>
         <ul id="historialLista" class="divide-y divide-slate-100 text-xs text-slate-600">
@@ -315,7 +307,6 @@
           <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">🔒 100% Privado</span>
         </div>
         
-        <!-- Input para nueva nota/mensaje con nombre libre -->
         <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
           <input type="text" id="notaAutor" placeholder="Tu nombre o apodo..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
           <textarea id="notaTexto" rows="2" placeholder="Escribe una nota importante o mensaje..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"></textarea>
@@ -327,7 +318,6 @@
           </div>
         </div>
 
-        <!-- Lista de notas sincronizadas -->
         <div id="notasLista" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
           <div class="py-3 text-center text-slate-400 italic text-xs">No hay notas registradas aún.</div>
         </div>
@@ -367,9 +357,10 @@
       notas: []
     };
 
-    document.getElementById('fechaPeriodoInput').value = new Date().toISOString().split('T')[0];
+    const fechaInput = document.getElementById('fechaPeriodoInput');
+    if(fechaInput) fechaInput.value = new Date().toISOString().split('T')[0];
 
-    // Control de Pestañas (Tabs) EXUESTO GLOBALMENTE
+    // Control de Pestañas (Tabs) con asignación global segura
     window.cambiarTab = function(tab) {
       ['ciclo', 'peliculas', 'museos', 'chat'].forEach(t => {
         const elVista = document.getElementById(`vista${t.charAt(0).toUpperCase() + t.slice(1)}`);
@@ -383,17 +374,24 @@
       if(tabActivo) tabActivo.className = "py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex flex-col items-center justify-center gap-0.5 font-bold";
     };
 
-    // Sincronización Firebase
+    // Sincronización Firebase con manejo de errores robusto
     onValue(estadoRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         estadoActual = Object.assign({ historial: [], duracionPromedio: 28, peliculas: [], museos: [], notas: [] }, data);
         renderApp(estadoActual);
-        const syncEl = document.getElementById('syncStatus');
-        if(syncEl) {
-          syncEl.innerText = "🟢 Sincronizado";
-          syncEl.className = "text-xs bg-emerald-500 px-2.5 py-1 rounded-full font-medium shadow-sm";
-        }
+      }
+      const syncEl = document.getElementById('syncStatus');
+      if(syncEl) {
+        syncEl.innerText = "🟢 Sincronizado";
+        syncEl.className = "text-xs bg-emerald-500 px-2.5 py-1 rounded-full font-medium shadow-sm";
+      }
+    }, (error) => {
+      console.error("Error de Firebase:", error);
+      const syncEl = document.getElementById('syncStatus');
+      if(syncEl) {
+        syncEl.innerText = "🔴 Error de red";
+        syncEl.className = "text-xs bg-rose-500 px-2.5 py-1 rounded-full font-medium shadow-sm";
       }
     });
 
@@ -576,3 +574,168 @@
         
         const hoy = new Date();
         hoy.setHours(0,0,0,0);
+        
+        const difTiempo = hoy - ultimaFUM;
+        const diaCiclo = Math.max(1, Math.floor(difTiempo / (1000 * 3600 * 24)) + 1);
+        
+        const prox = new Date(ultimaFUM);
+        prox.setDate(prox.getDate() + duracion);
+
+        const diaCicloEl = document.getElementById('diaCicloText');
+        const proxPerEl = document.getElementById('proxPeriodoText');
+        if(diaCicloEl) diaCicloEl.innerText = `Día ${diaCiclo}`;
+        if(proxPerEl) proxPerEl.innerText = prox.toLocaleDateString('es-ES');
+
+        let porcentaje = Math.min(Math.max(Math.round((diaCiclo / duracion) * 100), 2), 98);
+        const porcText = document.getElementById('porcentajeTexto');
+        const indGraf = document.getElementById('indicadorGrafico');
+        if(porcText) porcText.innerText = `${porcentaje}%`;
+        if(indGraf) indGraf.style.left = `${porcentaje}%`;
+
+        let fase = "", color = "", tit = "", txt = "", advElla = "";
+        if (diaCiclo <= 5) {
+          fase = "1. Menstrual"; color = "bg-rose-100 text-rose-700";
+          tit = "🩸 Caída de Estrógenos y Dopamina"; 
+          txt = "Baja disponibilidad ejecutiva. El cansancio físico acentúa la neblina mental y la procrastinación en el TDAH.";
+          advElla = "💆‍♀️ Cuidado con exigir la misma productividad de siempre. Cancela compromisos secundarios, no tomes decisiones importantes hoy y prioriza el descanso sin culpa.";
+        } else if (diaCiclo <= 13) {
+          fase = "2. Folicular"; color = "bg-emerald-100 text-emerald-700";
+          tit = "🌱 Aumento de Dopamina"; 
+          txt = "Pico de claridad mental y energía. Mejor momento del mes para organizar, iniciar proyectos o conversar temas complejos.";
+          advElla = "🚀 Aprovecha esta ventana de dopamina alta para avanzar tareas pendientes o planificar, pero cuida no hiperfocarte al punto de agotar tus reservas.";
+        } else if (diaCiclo <= (duracion - 12)) {
+          fase = "3. Ovulatoria"; color = "bg-sky-100 text-sky-700";
+          tit = "✨ Cúspide Hormonal"; 
+          txt = "Alta sociabilidad y energía física. El cerebro responde rápido a los estímulos.";
+          advElla = "✨ Tienes alta energía social. Disfruta salidas o proyectos, pero recuerda hidratarte y cuidar tus límites de descanso.";
+        } else {
+          fase = "4. Lútea / SPM"; color = "bg-amber-100 text-amber-800";
+          tit = "⚠️ Caída Libre de Dopamina (Sensibilidad TDAH)"; 
+          txt = "La progesterona disminuye la efectividad de la dopamina. Aumenta la sobrecarga sensorial, la fatiga de decisión y el riesgo de RSD.";
+          advElla = "⚠️ Alerta de Vulnerabilidad: Es común sentir que las cosas pesan más o percibir rechazo (RSD). Evita discusiones impulsivas, reduce los estímulos ruidosos y apóyate en tu pareja.";
+        }
+
+        const faseBd = document.getElementById('faseBadge');
+        const alertaTit = document.getElementById('alertaTitulo');
+        const alertaTxt = document.getElementById('alertaTexto');
+        const advTxt = document.getElementById('advertenciaEllaTexto');
+
+        if(faseBd) { faseBd.innerText = fase; faseBd.className = `text-xs font-bold px-3 py-1 rounded-full ${color}`; }
+        if(alertaTit) alertaTit.innerHTML = `<span>🧠</span> ${tit}`;
+        if(alertaTxt) alertaTxt.innerText = txt;
+        if(advTxt) advTxt.innerText = advElla;
+      }
+
+      // Render Historial
+      const listaEl = document.getElementById('historialLista');
+      if (listaEl) {
+        if (historial.length > 0) {
+          listaEl.innerHTML = historial.map((f, idx) => {
+            const p = f.split('-');
+            const d = new Date(p[0], p[1] - 1, p[2]);
+            return `
+              <li class="py-2 flex justify-between items-center border-b border-slate-100 last:border-0">
+                <div>
+                  <span class="font-bold text-slate-700">Periodo #${historial.length - idx}</span>
+                  <span class="block text-slate-500">${d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                </div>
+                <div class="flex gap-1.5">
+                  <button onclick="window.editarPeriodo(${idx})" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️ Editar</button>
+                  <button onclick="window.eliminarPeriodo(${idx})" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
+                </div>
+              </li>
+            `;
+          }).join('');
+        } else {
+          listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay registros aún.</li>`;
+        }
+      }
+
+      // Render Películas
+      const pelisListaEl = document.getElementById('pelisLista');
+      const pelis = data.peliculas || [];
+      if (pelisListaEl) {
+        if (pelis.length > 0) {
+          pelisListaEl.innerHTML = pelis.map((p, idx) => `
+            <li class="py-2.5 px-3 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="text-base">${p.avatar}</span>
+                <div>
+                  <span class="font-bold text-slate-800 block text-xs">${p.titulo}</span>
+                  <span class="text-[10px] text-slate-400">${p.fecha}</span>
+                </div>
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="window.editarPelicula(${idx})" class="bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️</button>
+                <button onclick="window.eliminarPelicula(${idx})" class="bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
+              </div>
+            </li>
+          `).join('');
+        } else {
+          pelisListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado películas aún.</li>`;
+        }
+      }
+
+      // Render Museos
+      const museosListaEl = document.getElementById('museosLista');
+      const museos = data.museos || [];
+      if (museosListaEl) {
+        if (museos.length > 0) {
+          museosListaEl.innerHTML = museos.map((m, idx) => `
+            <li class="py-2.5 px-3 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
+              <div class="flex items-center gap-2">
+                <span class="text-base">${m.avatar}</span>
+                <div>
+                  <span class="font-bold text-slate-800 block text-xs">${m.titulo}</span>
+                  <span class="text-[10px] text-slate-400">${m.fecha}</span>
+                </div>
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="window.editarMuseo(${idx})" class="bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️</button>
+                <button onclick="window.eliminarMuseo(${idx})" class="bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
+              </div>
+            </li>
+          `).join('');
+        } else {
+          museosListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado museos aún.</li>`;
+        }
+      }
+
+      // Render Notas & Chat
+      const notasListaEl = document.getElementById('notasLista');
+      const notas = data.notas || [];
+      if (notasListaEl) {
+        if (notas.length > 0) {
+          notasListaEl.innerHTML = notas.map((n, idx) => `
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+              <div class="flex justify-between items-center text-[10px] text-slate-400">
+                <span class="font-bold text-indigo-600">${n.autor}</span>
+                <span>${n.fecha}</span>
+              </div>
+              <p class="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">${n.texto}</p>
+              <div class="text-right pt-1">
+                <button onclick="window.eliminarNota(${idx})" class="text-[10px] text-rose-500 hover:underline">Eliminar nota</button>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          notasListaEl.innerHTML = `<div class="py-3 text-center text-slate-400 italic text-xs">No hay notas registradas aún.</div>`;
+        }
+      }
+
+      let accion = "🟢 Estado Fluido: Momento ideal para coordinar actividades o compartir tiempo de calidad.";
+      if (data.rsd && data.fatiga) {
+        accion = "🛡️ OPCIÓN RECOMENDADA: Cobertura total. No hagas preguntas de opción múltiple, gestiona la cena/hogar directamente y valida sus emociones sin juzgar.";
+      } else if (data.fatiga) {
+        accion = "🍲 OPCIÓN RECOMENDADA: Reduce su carga cognitiva. Elige tú qué comer/hacer y ofrécele opciones cerradas (ej. ¿Prefieres A o B?).";
+      } else if (data.rsd) {
+        accion = "💬 OPCIÓN RECOMENDADA: Afirmación de seguridad. Ofrece respuestas con tono afable para mitigar la sensación de rechazo percibido por el TDAH.";
+      } else if (data.bateria === 'Baja') {
+        accion = "🪫 OPCIÓN RECOMENDADA: Espacio de bajo estímulo. Desactiva ruidos/luces fuertes y evita hacerle demandas inmediatas.";
+      }
+      const accionEl = document.getElementById('accionMasculina');
+      if(accionEl) accionEl.innerText = accion;
+    }
+  </script>
+</body>
+</html>
