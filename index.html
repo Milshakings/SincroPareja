@@ -29,44 +29,34 @@
 
     window.activarNotificaciones = async function() {
       if (!("Notification" in window)) {
-        alert("⚠️ Este navegador no soporta notificaciones Push.");
+        alert("⚠️ Este navegador no soporta notificaciones.");
         return;
       }
-      if (Notification.permission === "denied") {
-        alert("🚫 Las notificaciones están bloqueadas en tu navegador.\n\nPor favor presiona el candado 🔒 al lado de la URL para cambiarlas a 'Permitir'.");
-        return;
-      }
-      if (window.OneSignal) {
-        try {
-          const permiso = await OneSignal.Notifications.requestPermission();
-          if (permiso) {
-            alert("✅ ¡Notificaciones activadas con éxito!");
-          } else {
-            alert("⚠️ No se concedieron los permisos de notificación.");
-          }
-        } catch (e) {
-          console.error(e);
-          alert("Error activando notificaciones: " + e.message);
-        }
-      } else {
-        alert("El sistema de notificaciones está cargando, reintenta en un momento.");
-      }
-    };
-
-    window.probarNotificacion = async function() {
-      if (Notification.permission === "granted") {
-        new Notification("💜 Alerta SincroPareja", {
-          body: "¡Prueba exitosa! Las notificaciones locales y el sistema Push están activos.",
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        alert("✅ ¡Notificaciones activadas con éxito en este dispositivo!");
+        new Notification("💜 SincroPareja", {
+          body: "¡Las notificaciones están funcionando perfectamente aquí!",
           icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
         });
       } else {
-        alert("Primero debes hacer clic en 'Activar Notificaciones' para dar permiso.");
+        alert("🚫 Los permisos de notificación fueron denegados o bloqueados en el navegador.");
+      }
+    };
+
+    window.probarNotificacionLocal = function() {
+      if (Notification.permission === "granted") {
+        new Notification("💜 Alerta SincroPareja", {
+          body: "¡Prueba de notificación exitosa! Todo en sintonía.",
+          icon: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png"
+        });
+      } else {
         window.activarNotificaciones();
       }
     };
   </script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-20 select-none">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-24 select-none">
 
   <!-- Encabezado Fijo -->
   <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
@@ -80,15 +70,18 @@
 
   <!-- Navegación por Pestañas (Tabs) -->
   <nav class="max-w-md mx-auto px-4 pt-3 pb-1">
-    <div class="grid grid-cols-3 gap-1 bg-slate-200/80 p-1 rounded-2xl shadow-inner text-xs font-bold text-slate-600">
-      <button onclick="cambiarTab('ciclo')" id="tabCiclo" class="py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center gap-1">
-        <span>🩸</span> Ciclo & TDAH
+    <div class="grid grid-cols-4 gap-1 bg-slate-200/80 p-1 rounded-2xl shadow-inner text-[11px] font-bold text-slate-600">
+      <button onclick="cambiarTab('ciclo')" id="tabCiclo" class="py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex flex-col items-center justify-center gap-0.5">
+        <span>🩸</span> Ciclo
       </button>
-      <button onclick="cambiarTab('peliculas')" id="tabPeliculas" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex items-center justify-center gap-1">
+      <button onclick="cambiarTab('peliculas')" id="tabPeliculas" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
         <span>🎬</span> Películas
       </button>
-      <button onclick="cambiarTab('museos')" id="tabMuseos" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex items-center justify-center gap-1">
+      <button onclick="cambiarTab('museos')" id="tabMuseos" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
         <span>🏛️</span> Museos
+      </button>
+      <button onclick="cambiarTab('chat')" id="tabChat" class="py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5">
+        <span>💬</span> Notas
       </button>
     </div>
   </nav>
@@ -101,9 +94,9 @@
       <!-- Sección Notificaciones -->
       <section class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-2 text-center">
         <button onclick="activarNotificaciones()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold py-3 rounded-xl shadow transition-all flex items-center justify-center gap-2">
-          <span>🔔</span> Activar Notificaciones Push
+          <span>🔔</span> Activar Permisos de Notificación
         </button>
-        <button onclick="probarNotificacion()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
+        <button onclick="probarNotificacionLocal()" class="w-full bg-slate-800 hover:bg-slate-900 active:scale-95 text-white text-xs font-bold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2">
           <span>📲</span> Probar Notificación Local
         </button>
       </section>
@@ -136,7 +129,6 @@
           </div>
         </div>
 
-        <!-- Barra de Progreso Gráfica -->
         <div class="space-y-1.5 pt-2">
           <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
             <span>Línea de tiempo del ciclo</span>
@@ -157,7 +149,6 @@
           </div>
         </div>
 
-        <!-- Impacto TDAH & Neurología -->
         <div id="alertaBox" class="p-4 rounded-xl border border-slate-100 bg-slate-50 space-y-1">
           <div class="flex items-center gap-2 font-bold text-sm" id="alertaTitulo">
             <span>🧠</span> Impacto Neurobiológico & TDAH
@@ -165,7 +156,6 @@
           <p id="alertaTexto" class="text-xs leading-relaxed text-slate-600">Cargando...</p>
         </div>
 
-        <!-- Advertencia & Autocuidado TDAH para Ella -->
         <div id="advertenciaEllaBox" class="p-4 rounded-xl border border-rose-200 bg-rose-50 space-y-1.5">
           <div class="flex items-center gap-2 font-bold text-xs text-rose-800">
             <span>👑</span> Advertencia & Recomendaciones de Autocuidado para Ella
@@ -214,7 +204,7 @@
         <p id="accionMasculina" class="text-sm font-medium leading-relaxed">Esperando datos...</p>
       </section>
 
-      <!-- Historial de Periodos con opción de Editar / Borrar -->
+      <!-- Historial de Periodos -->
       <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-3">
         <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Historial de Fechas (Editar / Borrar)</h2>
         <ul id="historialLista" class="divide-y divide-slate-100 text-xs text-slate-600">
@@ -310,6 +300,35 @@
       </section>
     </div>
 
+    <!-- ================= VISTA 4: NOTAS & CHAT PRIVADO ================= -->
+    <div id="vistaChat" class="space-y-6 hidden">
+      <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>💬</span> Notas y Chat Privado
+          </h2>
+          <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">🔒 100% Privado</span>
+        </div>
+        
+        <!-- Input para nueva nota/mensaje con nombre libre -->
+        <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+          <input type="text" id="notaAutor" placeholder="Tu nombre o apodo (ej. Raúl, Lily)..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
+          <textarea id="notaTexto" rows="2" placeholder="Escribe una nota importante o mensaje..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"></textarea>
+          
+          <div class="flex justify-end">
+            <button onclick="agregarNota()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition-all">
+              Enviar Nota
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de notas sincronizadas -->
+        <div id="notasLista" class="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+          <div class="py-3 text-center text-slate-400 italic text-xs">No hay notas registradas aún.</div>
+        </div>
+      </section>
+    </div>
+
   </main>
 
   <!-- Firebase SDK v9 -->
@@ -339,174 +358,18 @@
       fatiga: false,
       rsd: false,
       peliculas: [],
-      museos: []
+      museos: [],
+      notas: []
     };
 
     document.getElementById('fechaPeriodoInput').value = new Date().toISOString().split('T')[0];
 
     // Control de Pestañas (Tabs)
     window.cambiarTab = function(tab) {
-      ['ciclo', 'peliculas', 'museos'].forEach(t => {
+      ['ciclo', 'peliculas', 'museos', 'chat'].forEach(t => {
         document.getElementById(`vista${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.add('hidden');
-        document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`).className = "py-2.5 rounded-xl hover:text-indigo-600 transition-all flex items-center justify-center gap-1";
-      });
-      document.getElementById(`vista${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
-      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).className = "py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center gap-1 font-bold";
-    };
-
-    // Sincronización Firebase
-    onValue(estadoRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        estadoActual = Object.assign({ historial: [], duracionPromedio: 28, peliculas: [], museos: [] }, data);
-        renderApp(estadoActual);
-        document.getElementById('syncStatus').innerText = "🟢 Sincronizado";
-        document.getElementById('syncStatus').className = "text-xs bg-emerald-500 px-2.5 py-1 rounded-full font-medium shadow-sm";
-      }
-    });
-
-    window.guardarYActualizar = function() {
-      estadoActual.fatiga = document.getElementById('fatigaCheck').checked;
-      estadoActual.rsd = document.getElementById('rsdCheck').checked;
-      set(estadoRef, estadoActual);
-    };
-
-    window.setBateria = function(nivel) {
-      estadoActual.bateria = nivel;
-      window.guardarYActualizar();
-    };
-
-    // --- CICLO & HISTORIAL (Con Edición y Borrado) ---
-    window.registrarPeriodoPersonalizado = function() {
-      const fechaSel = document.getElementById('fechaPeriodoInput').value;
-      if (!fechaSel) return;
-
-      if (!estadoActual.historial) estadoActual.historial = [];
-      
-      if (!estadoActual.historial.includes(fechaSel)) {
-        estadoActual.historial.push(fechaSel);
-        recalcularHistorialYGuardar();
-      }
-    };
-
-    window.eliminarPeriodo = function(index) {
-      if (confirm("¿Estás seguro de eliminar esta fecha del historial?")) {
-        estadoActual.historial.splice(index, 1);
-        recalcularHistorialYGuardar();
-      }
-    };
-
-    window.editarPeriodo = function(index) {
-      const nuevaFecha = prompt("Modifica la fecha (Formato AAAA-MM-DD):", estadoActual.historial[index]);
-      if (nuevaFecha) {
-        estadoActual.historial[index] = nuevaFecha;
-        recalcularHistorialYGuardar();
-      }
-    };
-
-    function recalcularHistorialYGuardar() {
-      estadoActual.historial.sort((a, b) => new Date(b.replace(/-/g, '/')) - new Date(a.replace(/-/g, '/')));
-      if (estadoActual.historial.length >= 2) {
-        let sumaDias = 0;
-        for (let i = 0; i < estadoActual.historial.length - 1; i++) {
-          const f1 = new Date(estadoActual.historial[i].replace(/-/g, '/'));
-          const f2 = new Date(estadoActual.historial[i + 1].replace(/-/g, '/'));
-          sumaDias += Math.abs(f1 - f2) / (1000 * 3600 * 24);
-        }
-        estadoActual.duracionPromedio = Math.round(sumaDias / (estadoActual.historial.length - 1));
-      }
-      window.guardarYActualizar();
-    }
-
-    // --- PELÍCULAS ---
-    window.togglePeliFecha = function() {
-      const chk = document.getElementById('peliOmitirFecha').checked;
-      document.getElementById('peliFecha').disabled = chk;
-      if (chk) document.getElementById('peliFecha').value = "";
-    };
-
-    window.agregarPelicula = function() {
-      const titulo = document.getElementById('peliTitulo').value.trim();
-      const avatar = document.getElementById('peliAvatar').value;
-      const fecha = document.getElementById('peliOmitirFecha').checked ? "Sin fecha" : document.getElementById('peliFecha').value;
-
-      if (!titulo) return alert("Por favor escribe el título de la película.");
-
-      if (!estadoActual.peliculas) estadoActual.peliculas = [];
-      estadoActual.peliculas.unshift({ titulo, avatar, fecha: fecha || "Sin fecha" });
-
-      document.getElementById('peliTitulo').value = "";
-      document.getElementById('peliFecha').value = "";
-      document.getElementById('peliOmitirFecha').checked = false;
-      document.getElementById('peliFecha').disabled = false;
-
-      window.guardarYActualizar();
-    };
-
-    window.eliminarPelicula = function(index) {
-      estadoActual.peliculas.splice(index, 1);
-      window.guardarYActualizar();
-    };
-
-    window.editarPelicula = function(index) {
-      const p = estadoActual.peliculas[index];
-      const nuevoTitulo = prompt("Corregir título de la película:", p.titulo);
-      if (nuevoTitulo !== null) {
-        p.titulo = nuevoTitulo.trim() || p.titulo;
-        const nuevaFecha = prompt("Corregir fecha (o déjalo igual / escribe Sin fecha):", p.fecha);
-        if (nuevaFecha !== null) p.fecha = nuevaFecha.trim() || "Sin fecha";
-        window.guardarYActualizar();
-      }
-    };
-
-    // --- MUSEOS ---
-    window.toggleMuseoFecha = function() {
-      const chk = document.getElementById('museoOmitirFecha').checked;
-      document.getElementById('museoFecha').disabled = chk;
-      if (chk) document.getElementById('museoFecha').value = "";
-    };
-
-    window.agregarMuseo = function() {
-      const titulo = document.getElementById('museoTitulo').value.trim();
-      const avatar = document.getElementById('museoAvatar').value;
-      const fecha = document.getElementById('museoOmitirFecha').checked ? "Sin fecha" : document.getElementById('museoFecha').value;
-
-      if (!titulo) return alert("Por favor escribe el nombre del museo o lugar.");
-
-      if (!estadoActual.museos) estadoActual.museos = [];
-      estadoActual.museos.unshift({ titulo, avatar, fecha: fecha || "Sin fecha" });
-
-      document.getElementById('museoTitulo').value = "";
-      document.getElementById('museoFecha').value = "";
-      document.getElementById('museoOmitirFecha').checked = false;
-      document.getElementById('museoFecha').disabled = false;
-
-      window.guardarYActualizar();
-    };
-
-    window.eliminarMuseo = function(index) {
-      estadoActual.museos.splice(index, 1);
-      window.guardarYActualizar();
-    };
-
-    window.editarMuseo = function(index) {
-      const m = estadoActual.museos[index];
-      const nuevoTitulo = prompt("Corregir nombre del museo:", m.titulo);
-      if (nuevoTitulo !== null) {
-        m.titulo = nuevoTitulo.trim() || m.titulo;
-        const nuevaFecha = prompt("Corregir fecha (o déjalo igual / escribe Sin fecha):", m.fecha);
-        if (nuevaFecha !== null) m.fecha = nuevaFecha.trim() || "Sin fecha";
-        window.guardarYActualizar();
-      }
-    };
-
-    // --- RENDERIZAR VISTAS ---
-    function renderApp(data) {
-      document.getElementById('fatigaCheck').checked = !!data.fatiga;
-      document.getElementById('rsdCheck').checked = !!data.rsd;
-
-      ['Baja', 'Media', 'Alta'].forEach(b => {
-        const btn = document.getElementById(`btnBat${b}`);
+        document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}`).className = "py-2.5 rounded-xl hover:text-indigo-600 transition-all flex flex-col items-center justify-center gap-0.5"; }); document.getElementById(`vista${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
+      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).className = "py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex flex-col items-center justify-center gap-0.5 font-bold"; };  // Sincronización Firebase onValue(estadoRef, (snapshot) => { const data = snapshot.val(); if (data) { estadoActual = Object.assign({ historial: [], duracionPromedio: 28, peliculas: [], museos: [], notas: [] }, data); renderApp(estadoActual); document.getElementById('syncStatus').innerText = "🟢 Sincronizado"; document.getElementById('syncStatus').className = "text-xs bg-emerald-500 px-2.5 py-1 rounded-full font-medium shadow-sm"; } });  window.guardarYActualizar = function() { estadoActual.fatiga = document.getElementById('fatigaCheck').checked; estadoActual.rsd = document.getElementById('rsdCheck').checked; set(estadoRef, estadoActual); };  window.setBateria = function(nivel) { estadoActual.bateria = nivel; window.guardarYActualizar(); };  // --- CICLO & HISTORIAL --- window.registrarPeriodoPersonalizado = function() { const fechaSel = document.getElementById('fechaPeriodoInput').value; if (!fechaSel) return; if (!estadoActual.historial) estadoActual.historial = []; if (!estadoActual.historial.includes(fechaSel)) { estadoActual.historial.push(fechaSel); recalcularHistorialYGuardar(); } };  window.eliminarPeriodo = function(index) { if (confirm("¿Estás seguro de eliminar esta fecha del historial?")) { estadoActual.historial.splice(index, 1); recalcularHistorialYGuardar(); } };  window.editarPeriodo = function(index) { const nuevaFecha = prompt("Modifica la fecha (Formato AAAA-MM-DD):", estadoActual.historial[index]); if (nuevaFecha) { estadoActual.historial[index] = nuevaFecha; recalcularHistorialYGuardar(); } };  function recalcularHistorialYGuardar() { estadoActual.historial.sort((a, b) => new Date(b.replace(/-/g, '/')) - new Date(a.replace(/-/g, '/'))); if (estadoActual.historial.length >= 2) { let sumaDias = 0; for (let i = 0; i < estadoActual.historial.length - 1; i++) { const f1 = new Date(estadoActual.historial[i].replace(/-/g, '/')); const f2 = new Date(estadoActual.historial[i + 1].replace(/-/g, '/')); sumaDias += Math.abs(f1 - f2) / (1000 * 3600 * 24); } estadoActual.duracionPromedio = Math.round(sumaDias / (estadoActual.historial.length - 1)); } window.guardarYActualizar(); }  // --- PELÍCULAS --- window.togglePeliFecha = function() { const chk = document.getElementById('peliOmitirFecha').checked; document.getElementById('peliFecha').disabled = chk; if (chk) document.getElementById('peliFecha').value = ""; };  window.agregarPelicula = function() { const titulo = document.getElementById('peliTitulo').value.trim(); const avatar = document.getElementById('peliAvatar').value; const fecha = document.getElementById('peliOmitirFecha').checked ? "Sin fecha" : document.getElementById('peliFecha').value; if (!titulo) return alert("Por favor escribe el título de la película."); if (!estadoActual.peliculas) estadoActual.peliculas = []; estadoActual.peliculas.unshift({ titulo, avatar, fecha: fecha \vert{}\vert{} "Sin fecha" }); document.getElementById('peliTitulo').value = ""; document.getElementById('peliFecha').value = ""; document.getElementById('peliOmitirFecha').checked = false; document.getElementById('peliFecha').disabled = false; window.guardarYActualizar(); };  window.eliminarPelicula = function(index) { estadoActual.peliculas.splice(index, 1); window.guardarYActualizar(); };  window.editarPelicula = function(index) { const p = estadoActual.peliculas[index]; const nuevoTitulo = prompt("Corregir título de la película:", p.titulo); if (nuevoTitulo !== null) { p.titulo = nuevoTitulo.trim() \vert{}\vert{} p.titulo; const nuevaFecha = prompt("Corregir fecha:", p.fecha); if (nuevaFecha !== null) p.fecha = nuevaFecha.trim() \vert{}\vert{} "Sin fecha"; window.guardarYActualizar(); } };  // --- MUSEOS --- window.toggleMuseoFecha = function() { const chk = document.getElementById('museoOmitirFecha').checked; document.getElementById('museoFecha').disabled = chk; if (chk) document.getElementById('museoFecha').value = ""; };  window.agregarMuseo = function() { const titulo = document.getElementById('museoTitulo').value.trim(); const avatar = document.getElementById('museoAvatar').value; const fecha = document.getElementById('museoOmitirFecha').checked ? "Sin fecha" : document.getElementById('museoFecha').value; if (!titulo) return alert("Por favor escribe el nombre del museo o lugar."); if (!estadoActual.museos) estadoActual.museos = []; estadoActual.museos.unshift({ titulo, avatar, fecha: fecha \vert{}\vert{} "Sin fecha" }); document.getElementById('museoTitulo').value = ""; document.getElementById('museoFecha').value = ""; document.getElementById('museoOmitirFecha').checked = false; document.getElementById('museoFecha').disabled = false; window.guardarYActualizar(); };  window.eliminarMuseo = function(index) { estadoActual.museos.splice(index, 1); window.guardarYActualizar(); };  window.editarMuseo = function(index) { const m = estadoActual.museos[index]; const nuevoTitulo = prompt("Corregir nombre del museo:", m.titulo); if (nuevoTitulo !== null) { m.titulo = nuevoTitulo.trim() \vert{}\vert{} m.titulo; const nuevaFecha = prompt("Corregir fecha:", m.fecha); if (nuevaFecha !== null) m.fecha = nuevaFecha.trim() \vert{}\vert{} "Sin fecha"; window.guardarYActualizar(); } };  // --- NOTAS & CHAT PRIVADO --- window.agregarNota = function() { const autor = document.getElementById('notaAutor').value.trim(); const texto = document.getElementById('notaTexto').value.trim();  if (!autor) return alert("Por favor escribe tu nombre."); if (!texto) return alert("Escribe el contenido de la nota.");  const fechaHora = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }); if (!estadoActual.notas) estadoActual.notas = []; estadoActual.notas.unshift({ texto, autor, fecha: fechaHora });  document.getElementById('notaTexto').value = ""; window.guardarYActualizar(); };  window.eliminarNota = function(index) { if (confirm("¿Eliminar esta nota?")) { estadoActual.notas.splice(index, 1); window.guardarYActualizar(); } };  // --- RENDERIZAR VISTAS --- function renderApp(data) { document.getElementById('fatigaCheck').checked = !!data.fatiga; document.getElementById('rsdCheck').checked = !!data.rsd;  ['Baja', 'Media', 'Alta'].forEach(b => { const btn = document.getElementById(`btnBat${b}`);
         if (data.bateria === b) {
           btn.className = "bat-btn border p-2.5 rounded-xl text-center bg-indigo-50 border-indigo-500 font-semibold shadow-sm";
         } else {
@@ -516,27 +379,11 @@
 
       const historial = data.historial || [];
       const duracion = data.duracionPromedio || 28;
-      document.getElementById('promedioText').innerText = `(Promedio: ${duracion} días)`;
-
-      if (historial.length > 0) {
-        const partesFecha = historial[0].split('-');
-        const ultimaFUM = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
-        
-        const hoy = new Date();
-        hoy.setHours(0,0,0,0);
-        
-        const difTiempo = hoy - ultimaFUM;
-        const diaCiclo = Math.max(1, Math.floor(difTiempo / (1000 * 3600 * 24)) + 1);
-        
-        const prox = new Date(ultimaFUM);
-        prox.setDate(prox.getDate() + duracion);
-
-        document.getElementById('diaCicloText').innerText = `Día ${diaCiclo}`;
+      document.getElementById('promedioText').innerText = `(Promedio: ${duracion} días)`;  if (historial.length > 0) { const partesFecha = historial[0].split('-'); const ultimaFUM = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);  const hoy = new Date(); hoy.setHours(0,0,0,0);  const difTiempo = hoy - ultimaFUM; const diaCiclo = Math.max(1, Math.floor(difTiempo / (1000 * 3600 * 24)) + 1);  const prox = new Date(ultimaFUM); prox.setDate(prox.getDate() + duracion);  document.getElementById('diaCicloText').innerText = `Día ${diaCiclo}`;
         document.getElementById('proxPeriodoText').innerText = prox.toLocaleDateString('es-ES');
 
         let porcentaje = Math.min(Math.max(Math.round((diaCiclo / duracion) * 100), 2), 98);
-        document.getElementById('porcentajeTexto').innerText = `${porcentaje}%`;
-        document.getElementById('indicadorGrafico').style.left = `${porcentaje}%`;
+        document.getElementById('porcentajeTexto').innerText = `${porcentaje}\%`; document.getElementById('indicadorGrafico').style.left = `${porcentaje}%`;
 
         let fase = "", color = "", tit = "", txt = "", advElla = "";
         if (diaCiclo <= 5) {
@@ -562,13 +409,12 @@
         }
 
         document.getElementById('faseBadge').innerText = fase;
-        document.getElementById('faseBadge').className = `text-xs font-bold px-3 py-1 rounded-full ${color}`;
-        document.getElementById('alertaTitulo').innerHTML = `<span>🧠</span> ${tit}`;
+        document.getElementById('faseBadge').className = `text-xs font-bold px-3 py-1 rounded-full ${color}`; document.getElementById('alertaTitulo').innerHTML = `<span>🧠</span> ${tit}`;
         document.getElementById('alertaTexto').innerText = txt;
         document.getElementById('advertenciaEllaTexto').innerText = advElla;
       }
 
-      // Render Historial con botones de Editar y Borrar
+      // Render Historial
       const listaEl = document.getElementById('historialLista');
       if (historial.length > 0) {
         listaEl.innerHTML = historial.map((f, idx) => {
@@ -591,65 +437,9 @@
         listaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No hay registros aún.</li>`;
       }
 
-      // Render Películas con Editar y Borrar
+      // Render Películas
       const pelisListaEl = document.getElementById('pelisLista');
       const pelis = data.peliculas || [];
       if (pelis.length > 0) {
         pelisListaEl.innerHTML = pelis.map((p, idx) => `
-          <li class="py-2.5 px-3 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
-            <div class="flex items-center gap-2">
-              <span class="text-base">${p.avatar}</span>
-              <div>
-                <span class="font-bold text-slate-800 block text-xs">${p.titulo}</span>
-                <span class="text-[10px] text-slate-400">${p.fecha}</span>
-              </div>
-            </div>
-            <div class="flex gap-1.5">
-              <button onclick="editarPelicula(${idx})" class="bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️</button>
-              <button onclick="eliminarPelicula(${idx})" class="bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
-            </div>
-          </li>
-        `).join('');
-      } else {
-        pelisListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado películas aún.</li>`;
-      }
-
-      // Render Museos con Editar y Borrar
-      const museosListaEl = document.getElementById('museosLista');
-      const museos = data.museos || [];
-      if (museos.length > 0) {
-        museosListaEl.innerHTML = museos.map((m, idx) => `
-          <li class="py-2.5 px-3 bg-slate-50 rounded-xl flex items-center justify-between border border-slate-100">
-            <div class="flex items-center gap-2">
-              <span class="text-base">${m.avatar}</span>
-              <div>
-                <span class="font-bold text-slate-800 block text-xs">${m.titulo}</span>
-                <span class="text-[10px] text-slate-400">${m.fecha}</span>
-              </div>
-            </div>
-            <div class="flex gap-1.5">
-              <button onclick="editarMuseo(${idx})" class="bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 px-2 py-1 rounded text-[10px] font-semibold">✏️</button>
-              <button onclick="eliminarMuseo(${idx})" class="bg-rose-50 border border-rose-100 hover:bg-rose-100 text-rose-600 px-2 py-1 rounded text-[10px] font-semibold">🗑️</button>
-            </div>
-          </li>
-        `).join('');
-      } else {
-        museosListaEl.innerHTML = `<li class="py-2 text-slate-400 italic">No han guardado museos aún.</li>`;
-      }
-
-      // Acciones para Él
-      let accion = "🟢 Estado Fluido: Momento ideal para coordinar actividades o compartir tiempo de calidad.";
-      if (data.rsd && data.fatiga) {
-        accion = "🛡️ OPCIÓN RECOMENDADA: Cobertura total. No hagas preguntas de opción múltiple, gestiona la cena/hogar directamente y valida sus emociones sin juzgar.";
-      } else if (data.fatiga) {
-        accion = "🍲 OPCIÓN RECOMENDADA: Reduce su carga cognitiva. Elige tú qué comer/hacer y ofrécele opciones cerradas (ej. ¿Prefieres A o B?).";
-      } else if (data.rsd) {
-        accion = "💬 OPCIÓN RECOMENDADA: Afirmación de seguridad. Ofrece respuestas con tono afable para mitigar la sensación de rechazo percibido por el TDAH.";
-      } else if (data.bateria === 'Baja') {
-        accion = "🪫 OPCIÓN RECOMENDADA: Espacio de bajo estímulo. Desactiva ruidos/luces fuertes y evita hacerle demandas inmediatas.";
-      }
-      document.getElementById('accionMasculina').innerText = accion;
-    }
-  </script>
-</body>
-</html>
+          <li class="py-2.5 px-3 bg-slate-50 rounded-
