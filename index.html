@@ -61,7 +61,7 @@
     };
   </script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-24 select-none">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col select-none">
 
   <!-- Encabezado Fijo -->
   <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
@@ -74,7 +74,7 @@
   </header>
 
   <!-- Navegación por Pestañas (Tabs) -->
-  <nav class="max-w-md mx-auto px-4 pt-3 pb-1">
+  <nav class="max-w-md w-full mx-auto px-4 pt-3 pb-1">
     <div class="grid grid-cols-4 gap-1 bg-slate-200/80 p-1 rounded-2xl shadow-inner text-[11px] font-bold text-slate-600">
       <button onclick="window.cambiarTab('ciclo')" id="tabCiclo" class="py-2.5 rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex flex-col items-center justify-center gap-0.5">
         <span>🩸</span> Ciclo
@@ -91,7 +91,7 @@
     </div>
   </nav>
 
-  <main class="max-w-md mx-auto p-4 space-y-6">
+  <main class="max-w-md w-full mx-auto p-4 space-y-6 flex-1">
 
     <!-- ================= VISTA 1: CICLO & TDAH ================= -->
     <div id="vistaCiclo" class="space-y-6">
@@ -307,7 +307,7 @@
           <span class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full font-medium">🔒 Privado & Sincronizado</span>
         </div>
         
-        <!-- Formulario principal para nueva nota -->
+        <!-- Formulario principal para nueva nota con imagen -->
         <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
           <div class="flex gap-2">
             <input type="text" id="notaAutor" placeholder="Tu nombre..." class="w-1/3 bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none font-medium">
@@ -321,8 +321,24 @@
           </div>
 
           <textarea id="notaTexto" rows="2" placeholder="Escribe una nota importante o mensaje..." class="w-full bg-white border border-slate-200 rounded-lg p-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"></textarea>
+
+          <!-- Adjuntar Imagen Persistente -->
+          <div class="space-y-2 pt-1">
+            <div class="flex items-center justify-between gap-2">
+              <label class="flex items-center gap-1.5 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-[11px] font-semibold px-3 py-1.5 rounded-lg cursor-pointer transition-all">
+                <span>🖼️</span> Adjuntar Imagen
+                <input type="file" id="notaImagenInput" accept="image/*" onchange="window.prepararImagenNota(event)" class="hidden">
+              </label>
+              <button type="button" id="btnQuitarImagen" onclick="window.limpiarImagenNota()" class="hidden text-[11px] text-rose-600 font-semibold hover:underline">
+                ✕ Quitar foto
+              </button>
+            </div>
+            <div id="previewImagenContainer" class="hidden">
+              <img id="previewImagenNota" src="" alt="Vista previa" class="w-full max-h-48 object-cover rounded-lg border border-slate-200">
+            </div>
+          </div>
           
-          <div class="flex justify-end">
+          <div class="flex justify-end pt-1">
             <button onclick="agregarNota()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition-all">
               + Publicar Nota
             </button>
@@ -330,13 +346,21 @@
         </div>
 
         <!-- Lista de notas interactivas -->
-        <div id="notasLista" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+        <div id="notasLista" class="space-y-3 max-h-[540px] overflow-y-auto pr-1">
           <div class="py-3 text-center text-slate-400 italic text-xs">No hay notas registradas aún.</div>
         </div>
       </section>
     </div>
 
   </main>
+
+  <!-- Pie de Página -->
+  <footer class="max-w-md w-full mx-auto px-4 py-5 text-center text-[11px] text-slate-400">
+    <div class="border-t border-slate-200/80 pt-3 space-y-0.5">
+      <p class="font-semibold text-slate-500">💜 SincroPareja</p>
+      <p>Espacio privado sincronizado para ciclo, TDAH y recuerdos compartidos.</p>
+    </div>
+  </footer>
 
   <!-- Firebase SDK v9 -->
   <script type="module">
@@ -368,6 +392,8 @@
       museos: [],
       notas: []
     };
+
+    let imagenPendienteBase64 = null;
 
     const fechaInput = document.getElementById('fechaPeriodoInput');
     if(fechaInput) fechaInput.value = new Date().toISOString().split('T')[0];
@@ -527,29 +553,75 @@
       }
     };
 
-    // --- NOTAS & CHAT INTERACTIVO (Con Reply, Likes y Colores) ---
+    // --- IMÁGENES EN NOTAS (Compresión local para persistir en Firebase) ---
+    window.prepararImagenNota = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxAncho = 700;
+          let ancho = img.width;
+          let alto = img.height;
+
+          if (ancho > maxAncho) {
+            alto = Math.round((alto * maxAncho) / ancho);
+            ancho = maxAncho;
+          }
+
+          canvas.width = ancho;
+          canvas.height = alto;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, ancho, alto);
+
+          imagenPendienteBase64 = canvas.toDataURL('image/jpeg', 0.72);
+          document.getElementById('previewImagenNota').src = imagenPendienteBase64;
+          document.getElementById('previewImagenContainer').classList.remove('hidden');
+          document.getElementById('btnQuitarImagen').classList.remove('hidden');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.limpiarImagenNota = function() {
+      imagenPendienteBase64 = null;
+      const inputFile = document.getElementById('notaImagenInput');
+      if (inputFile) inputFile.value = "";
+      document.getElementById('previewImagenNota').src = "";
+      document.getElementById('previewImagenContainer').classList.add('hidden');
+      document.getElementById('btnQuitarImagen').classList.add('hidden');
+    };
+
+    // --- NOTAS & CHAT INTERACTIVO ---
     window.agregarNota = function() {
       const autor = document.getElementById('notaAutor').value.trim();
       const texto = document.getElementById('notaTexto').value.trim();
       const color = document.getElementById('notaColor').value;
       
       if (!autor) return alert("Por favor escribe tu nombre.");
-      if (!texto) return alert("Escribe el contenido de la nota.");
+      if (!texto && !imagenPendienteBase64) return alert("Escribe una nota o adjunta una imagen.");
       
       const fechaHora = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
       if (!estadoActual.notas) estadoActual.notas = [];
       
       estadoActual.notas.unshift({
         texto,
+        imagen: imagenPendienteBase64 || null,
         autor,
         color,
         fecha: fechaHora,
         likes: 0,
         amores: 0,
+        risas: 0,
         respuestas: []
       });
 
       document.getElementById('notaTexto').value = "";
+      window.limpiarImagenNota();
       window.guardarYActualizar();
     };
 
@@ -562,8 +634,8 @@
 
     window.editarNota = function(index) {
       const nota = estadoActual.notas[index];
-      const nuevoTexto = prompt("Edita tu nota o mensaje:", nota.texto);
-      if (nuevoTexto !== null && nuevoTexto.trim() !== "") {
+      const nuevoTexto = prompt("Edita tu nota o mensaje:", nota.texto || "");
+      if (nuevoTexto !== null) {
         nota.texto = nuevoTexto.trim();
         window.guardarYActualizar();
       }
@@ -574,6 +646,8 @@
         estadoActual.notas[index].likes = (estadoActual.notas[index].likes || 0) + 1;
       } else if (tipo === 'amor') {
         estadoActual.notas[index].amores = (estadoActual.notas[index].amores || 0) + 1;
+      } else if (tipo === 'risa') {
+        estadoActual.notas[index].risas = (estadoActual.notas[index].risas || 0) + 1;
       }
       window.guardarYActualizar();
     };
@@ -761,6 +835,12 @@
         if (notas.length > 0) {
           notasListaEl.innerHTML = notas.map((n, idx) => {
             const colorClase = n.color || "bg-white border-slate-200";
+            const imagenHTML = n.imagen
+              ? `<img src="${n.imagen}" alt="Imagen de nota" class="w-full max-h-64 object-cover rounded-lg border border-slate-200/80">`
+              : "";
+            const textoHTML = n.texto
+              ? `<p class="text-xs text-slate-800 whitespace-pre-wrap leading-relaxed font-medium">${n.texto}</p>`
+              : "";
             const respuestasHTML = (n.respuestas || []).map(r => `
               <div class="mt-2 ml-4 p-2.5 bg-white/80 rounded-lg border border-slate-200 text-[11px] space-y-0.5">
                 <div class="flex justify-between font-bold text-indigo-600">
@@ -778,27 +858,31 @@
                   <span>${n.fecha}</span>
                 </div>
                 
-                <p class="text-xs text-slate-800 whitespace-pre-wrap leading-relaxed font-medium">${n.texto}</p>
+                ${textoHTML}
+                ${imagenHTML}
                 
                 <!-- Hilo de respuestas -->
                 <div class="space-y-1">${respuestasHTML}</div>
 
-                <!-- Botones de Interacción (Reaccionar, Responder, Editar, Borrar) -->
-                <div class="flex flex-wrap justify-between items-center pt-2 border-t border-slate-200/60 text-[11px]">
-                  <div class="flex gap-2 items-center">
+                <!-- Botones de Interacción -->
+                <div class="flex flex-wrap justify-between items-center gap-1.5 pt-2 border-t border-slate-200/60 text-[11px]">
+                  <div class="flex flex-wrap gap-1.5 items-center">
                     <button onclick="window.reaccionarNota(${idx}, 'like')" class="bg-white hover:bg-slate-100 border border-slate-200 px-2 py-1 rounded-md text-slate-700 shadow-2xs transition">
-                      👍 Me gusta (${n.likes || 0})
+                      👍 (${n.likes || 0})
                     </button>
                     <button onclick="window.reaccionarNota(${idx}, 'amor')" class="bg-white hover:bg-slate-100 border border-slate-200 px-2 py-1 rounded-md text-slate-700 shadow-2xs transition">
-                      ❤️ Me encanta (${n.amores || 0})
+                      ❤️ (${n.amores || 0})
+                    </button>
+                    <button onclick="window.reaccionarNota(${idx}, 'risa')" class="bg-white hover:bg-slate-100 border border-slate-200 px-2 py-1 rounded-md text-slate-700 shadow-2xs transition">
+                      😂 (${n.risas || 0})
                     </button>
                     <button onclick="window.responderNota(${idx})" class="text-indigo-600 font-bold hover:underline px-1">
                       💬 Responder
                     </button>
                   </div>
                   
-                  <div class="flex gap-1.5 pt-1 sm:pt-0">
-                    <button onclick="window.editarNota(${idx})" class="text-slate-600 hover:text-indigo-600 font-semibold px-1.5 py-0.5 bg-white/60 rounded border border-slate-200">✏️ Editar</button>
+                  <div class="flex gap-1.5">
+                    <button onclick="window.editarNota(${idx})" class="text-slate-600 hover:text-indigo-600 font-semibold px-1.5 py-0.5 bg-white/60 rounded border border-slate-200">✏️</button>
                     <button onclick="window.eliminarNota(${idx})" class="text-rose-600 hover:text-rose-800 font-semibold px-1.5 py-0.5 bg-white/60 rounded border border-rose-200">🗑️</button>
                   </div>
                 </div>
@@ -816,7 +900,7 @@
       } else if (data.fatiga) {
         accion = "🍲 OPCIÓN RECOMENDADA: Reduce su carga cognitiva. Elige tú qué comer/hacer y ofrécele opciones cerradas (ej. ¿Prefieres A o B?).";
       } else if (data.rsd) {
-        accion = "💬 OPCIÓN RECOMENDADA: Affirmación de seguridad. Ofrece respuestas con tono afable para mitigar la sensación de rechazo percibido por el TDAH.";
+        accion = "💬 OPCIÓN RECOMENDADA: Afirmación de seguridad. Ofrece respuestas con tono afable para mitigar la sensación de rechazo percibido por el TDAH.";
       } else if (data.bateria === 'Baja') {
         accion = "🪫 OPCIÓN RECOMENDADA: Espacio de bajo estímulo. Desactiva ruidos/luces fuertes y evita hacerle demandas inmediatas.";
       }
